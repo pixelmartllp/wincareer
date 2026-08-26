@@ -191,8 +191,18 @@ class GraphClient:
             if not data.get("is_valid"):
                 result["ok"] = False
                 result["problems"].append("Access token is not valid.")
-            for scope in ("pages_manage_posts", "pages_read_engagement"):
-                if scope not in (data.get("scopes") or []):
+
+            scopes = data.get("scopes") or []
+            needed = ["pages_manage_posts", "pages_read_engagement"]
+            if self.ig_user_id:
+                # Publishing to Instagram needs its own scopes, and a token
+                # that posts happily to the Page can still be refused by
+                # Instagram with a bare "(#10) Application does not have
+                # permission" - which says nothing about which permission.
+                needed += ["instagram_basic", "instagram_content_publish"]
+            for scope in needed:
+                if scope not in scopes:
+                    result["ok"] = False
                     result["problems"].append(f"Token is missing scope: {scope}")
         except MetaAPIError as exc:
             result["problems"].append(f"Token introspection failed: {exc}")

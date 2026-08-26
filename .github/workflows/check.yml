@@ -1,0 +1,45 @@
+name: Check credentials
+
+# Read-only. Run this to find out whether the secrets in *this repo* can
+# actually post, without posting anything.
+#
+# It exists because a token that works on a laptop proves nothing about the
+# one in the secret - and because the failure it is meant to catch,
+# "(#10) Application does not have permission", names no permission and can
+# only otherwise be discovered by a real post failing in front of an
+# audience.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Verify token, Page and Instagram
+        env:
+          WIN_META_ACCESS_TOKEN: ${{ secrets.WIN_META_ACCESS_TOKEN }}
+          WIN_META_PAGE_ID: ${{ secrets.WIN_META_PAGE_ID }}
+          WIN_META_IG_USER_ID: ${{ secrets.WIN_META_IG_USER_ID }}
+        run: python win_post.py verify
+
+      - name: What this does and does not prove
+        if: always()
+        run: |
+          echo "Green here means: the token is valid, it carries the scopes"
+          echo "publishing needs, the Page answers, and the Instagram account"
+          echo "is reachable with it."
+          echo
+          echo "It does NOT prove a publish will succeed. Instagram can still"
+          echo "refuse at the container step. The only conclusive test is a"
+          echo "real post, which the daily workflow will make."
