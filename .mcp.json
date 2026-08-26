@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "win-social": {
+      "command": "D:\Shi\.venv\Scripts\python.exe",
+      "args": ["-m", "win_social.server"],
+      "env": {
+        "PYTHONPATH": "D:\Shi\PM\win"
+      }
+    }
+  }
+}

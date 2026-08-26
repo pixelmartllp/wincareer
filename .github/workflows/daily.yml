@@ -1,0 +1,115 @@
+name: Daily post
+
+# One creative a day, generated and posted straight to the Page - the owner
+# chose no review step for this brand.
+#
+# Three runs, not one. GitHub's scheduler regularly fires a cron two or three
+# hours late; on the sibling pipeline an 08:07 job repeatedly landed after
+# 10:30 and the day was missed. `win_post.py daily` is idempotent - it checks
+# the ledger first and exits without posting if the day already went out - so
+# the later runs cost nothing on a normal day and rescue a delayed one.
+
+on:
+  schedule:
+    - cron: '30 3 * * *'    # 09:00 IST
+    - cron: '30 6 * * *'    # 12:00 IST - catch-up
+    - cron: '0 10 * * *'    # 15:30 IST - last chance
+  workflow_dispatch:
+    inputs:
+      count:
+        description: How many creatives
+        default: '1'
+      confirm:
+        description: Set to "false" for a dry run
+        default: 'true'
+
+concurrency:
+  # Two runs posting at once would double-post. The ledger check is not a
+  # substitute for this: both could read "nothing posted yet" before either
+  # writes.
+  group: win-daily
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    # ubuntu, not windows. Every brand font ships in assets/fonts/, so there
+    # is no dependency on the runner's system fonts - the guard step below
+    # proves that rather than assuming it.
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check every font resolves inside the repo
+        # Without this, deleting a font file would silently fall back to
+        # whatever the runner has and render the brand in the wrong typeface.
+        # A creative in the wrong face looks fine until it is next to a real
+        # one, which is far too late to notice.
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from win_social import brand
+          bad = []
+          for role, reported in brand.font_report().items():
+              path = Path(reported.split(' [')[0])
+              print(f"{role:14} {path}")
+              if not path.is_relative_to(brand.FONT_DIR):
+                  bad.append(f"{role} -> {path}")
+          if bad:
+              raise SystemExit("Fonts resolved outside the repo: " + "; ".join(bad))
+          print("all fonts from repo")
+          PY
+
+      - name: Generate and post
+        env:
+          WIN_META_ACCESS_TOKEN: ${{ secrets.WIN_META_ACCESS_TOKEN }}
+          WIN_META_PAGE_ID: ${{ secrets.WIN_META_PAGE_ID }}
+          WIN_META_IG_USER_ID: ${{ secrets.WIN_META_IG_USER_ID }}
+        run: |
+          count="${{ github.event.inputs.count }}"
+          # The scheduled run passes no input, so this fallback is the real
+          # daily number. The dispatch default only applies to manual runs.
+          [ -z "$count" ] && count=1
+          confirm="--confirm"
+          [ "${{ github.event.inputs.confirm }}" = "false" ] && confirm=""
+          python win_post.py daily --count "$count" $confirm
+
+      - name: Verify the creative before trusting the run
+        if: always()
+        run: |
+          pip install opencv-python-headless
+          day=$(date -u -d '+5 hours 30 minutes' +%Y-%m-%d)
+          if [ -d "output/$day" ]; then
+            python tools/verify_creative.py "output/$day"
+          else
+            echo "No batch for $day - nothing rendered this run."
+          fi
+
+      - name: Commit the ledger
+        # state/state.json is the cloud run's only memory of what it already
+        # posted. If this step is skipped the next run has no idea the day
+        # went out and will post it again.
+        if: always()
+        run: |
+          git config user.name  "win-social bot"
+          git config user.email "actions@github.com"
+          # -f is not needed and must not be used: if state/state.json ever
+          # becomes gitignored again this should fail loudly rather than
+          # quietly force past it and leave the ledger uncommitted.
+          git add state/state.json || {
+            echo "state/state.json could not be staged - is it gitignored?" >&2
+            exit 1
+          }
+          git diff --staged --quiet || git commit -m "Update publish state [skip ci]"
+          git push

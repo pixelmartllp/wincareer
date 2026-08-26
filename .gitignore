@@ -1,0 +1,22 @@
+# Live credentials - never commit. In the cloud these come from repo secrets.
+config.json
+
+# Rendered creatives: regenerated every run, and the cloud run has no use for
+# yesterday's.
+output/
+
+# Photo candidates awaiting review. Tens of megabytes, and only what survives
+# the contact sheet belongs in the repo - that lands in assets/backgrounds/.
+assets/_staging/
+
+# Ad-hoc images for one-off posts.
+media/*
+!media/.gitkeep
+
+__pycache__/
+*.pyc
+.venv/
+
+# NOTE: state/state.json is deliberately NOT ignored. It is the cloud run's
+# only memory of what it already posted; ignoring it would make every run
+# believe it was the first and post the day again.

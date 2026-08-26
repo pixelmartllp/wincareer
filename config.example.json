@@ -1,0 +1,10 @@
+{
+  "_comment": "Copy to config.json and fill in. config.json is gitignored - never commit it.",
+  "_page": "https://www.facebook.com/TheWinCareer",
+  "page_id": "YOUR_PAGE_ID",
+  "ig_user_id": "YOUR_INSTAGRAM_BUSINESS_ID",
+  "access_token": "YOUR_LONG_LIVED_PAGE_TOKEN",
+  "app_id": "YOUR_APP_ID",
+  "app_secret": "YOUR_APP_SECRET",
+  "api_version": "v25.0"
+}
