@@ -31,6 +31,8 @@ RECENT_BACKGROUNDS = 10
 EMPTY: dict[str, Any] = {
     "posts": [],
     "rotation": {"used_content": [], "recent_backgrounds": [], "cycles": 0},
+    # What each day is supposed to post, pinned the first time it is decided.
+    "plans": {},
 }
 
 
@@ -43,6 +45,7 @@ def load() -> dict[str, Any]:
         # A truncated ledger must not stop the day from posting.
         return json.loads(json.dumps(EMPTY))
     data.setdefault("posts", [])
+    data.setdefault("plans", {})
     rotation = data.setdefault("rotation", {})
     rotation.setdefault("used_content", [])
     rotation.setdefault("recent_backgrounds", [])
@@ -139,6 +142,37 @@ def mark_used(content_id: str, background: str) -> None:
         recent = [b for b in rotation["recent_backgrounds"] if b != background]
         recent.append(background)
         rotation["recent_backgrounds"] = recent[-RECENT_BACKGROUNDS:]
+    save(data)
+
+
+# --------------------------------------------------------------------------
+# Day plans
+# --------------------------------------------------------------------------
+
+def plan_for(date: str) -> list[dict[str, str]]:
+    """What this date is supposed to post, if it has already been decided."""
+    return list(load()["plans"].get(date, []))
+
+
+def set_plan(date: str, items: list[dict[str, str]]) -> None:
+    """Pin a date to a specific creative, once.
+
+    output/ is gitignored, so a cloud runner starts every run with no
+    creatives on disk and regenerates from scratch. Without a pinned plan
+    each run picks a *different* quote, and because the duplicate guard keys
+    on the content id, a second run would happily post a second, different
+    creative the same day. The first live run hit exactly that setup: one
+    run posted w036, the next generated w008.
+
+    Pinning makes regeneration reproduce the same creative, so a later run
+    can retry the platform that failed instead of inventing a new post.
+    """
+    data = load()
+    data["plans"][date] = items
+    # Keep this from growing forever; a fortnight is far more history than
+    # any retry needs.
+    for old in sorted(data["plans"])[:-14]:
+        del data["plans"][old]
     save(data)
 
 

@@ -22,17 +22,45 @@
       "content_id": "w036",
       "error": "OAuthException (code 10): (#10) Application does not have permission for this action",
       "image": "01-w036.jpg"
+    },
+    {
+      "date": "2026-08-26",
+      "time": "17:04 IST",
+      "timestamp": "2026-08-26T11:34:43.211354+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w062",
+      "post_id": "1091123227419567_122121427611314742",
+      "permalink": "https://www.facebook.com/1091123227419567_122121427611314742",
+      "image": "01-w062.jpg",
+      "note": "posted from a local test run, not by the workflow - kept because it is live on the Page"
+    },
+    {
+      "date": "2026-08-26",
+      "time": "17:05 IST",
+      "timestamp": "2026-08-26T11:35:05.317647+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w062",
+      "post_id": "17898901221592942",
+      "permalink": "https://www.instagram.com/p/DcgHerPGw5N/",
+      "image": "01-w062.jpg",
+      "note": "posted from a local test run, not by the workflow - kept because it is live on the Page"
     }
   ],
   "rotation": {
     "used_content": [
       "w036",
-      "w008"
+      "w008",
+      "w062"
     ],
     "recent_backgrounds": [
       "neutral-02.jpg",
       "neutral-08.jpg"
     ],
     "cycles": 0
-  }
+  },
+  "plans": {}
 }

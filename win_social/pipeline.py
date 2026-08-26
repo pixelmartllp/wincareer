@@ -86,13 +86,32 @@ def generate_day(count: int = 1, day: str | None = None,
         raise FileExistsError(
             f"A batch for {day} already exists. Pass overwrite to replace it.")
 
-    entries = content.select(count, theme=theme)
     layout = layout or renderer.DEFAULT_LAYOUT
+
+    # A day is decided once. Every later run for the same date rebuilds the
+    # identical creative rather than choosing again - see state.set_plan for
+    # why that matters in the cloud, where output/ never survives a run.
+    plan = state.plan_for(day)
+    if plan and len(plan) == count and not theme:
+        bank = {e["id"]: e for e in content.load_bank()["entries"]}
+        entries = [bank[p["content_id"]] for p in plan
+                   if p["content_id"] in bank]
+        pinned = [p["background"] for p in plan]
+        if len(entries) != count:            # bank edited since; re-decide
+            entries, pinned = content.select(count, theme=theme), []
+    else:
+        entries, pinned = content.select(count, theme=theme), []
 
     items: list[dict[str, Any]] = []
     for index, entry in enumerate(entries, start=1):
-        background = assets.pick_background(
-            theme=entry["theme"], exclude=state.recent_backgrounds())
+        if pinned:
+            background = brand.BACKGROUND_DIR / pinned[index - 1]
+            if not background.is_file():
+                background = assets.pick_background(
+                    theme=entry["theme"], exclude=state.recent_backgrounds())
+        else:
+            background = assets.pick_background(
+                theme=entry["theme"], exclude=state.recent_backgrounds())
         out_path = batch_dir(day) / f"{index:02d}-{entry['id']}.jpg"
 
         meta = renderer.render(entry, background, out_path,
@@ -110,7 +129,12 @@ def generate_day(count: int = 1, day: str | None = None,
             **meta,
         }
         items.append(item)
-        state.mark_used(entry["id"], Path(meta["background"]).name)
+        if not pinned:
+            state.mark_used(entry["id"], Path(meta["background"]).name)
+
+    if not pinned:
+        state.set_plan(day, [{"content_id": i["content_id"],
+                              "background": i["background"]} for i in items])
 
     batch = {
         "date": day,
