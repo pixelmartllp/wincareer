@@ -26,10 +26,12 @@
   ],
   "rotation": {
     "used_content": [
-      "w036"
+      "w036",
+      "w008"
     ],
     "recent_backgrounds": [
-      "neutral-02.jpg"
+      "neutral-02.jpg",
+      "neutral-08.jpg"
     ],
     "cycles": 0
   }
