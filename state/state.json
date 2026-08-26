@@ -1,8 +1,36 @@
 {
-  "posts": [],
+  "posts": [
+    {
+      "date": "2026-08-26",
+      "time": "17:00 IST",
+      "timestamp": "2026-08-26T11:30:26.796561+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w036",
+      "post_id": "1091123227419567_122121427137314742",
+      "permalink": "https://www.facebook.com/1091123227419567_122121427137314742",
+      "image": "01-w036.jpg"
+    },
+    {
+      "date": "2026-08-26",
+      "time": "17:00 IST",
+      "timestamp": "2026-08-26T11:30:34.909400+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": false,
+      "content_id": "w036",
+      "error": "OAuthException (code 10): (#10) Application does not have permission for this action",
+      "image": "01-w036.jpg"
+    }
+  ],
   "rotation": {
-    "used_content": [],
-    "recent_backgrounds": [],
+    "used_content": [
+      "w036"
+    ],
+    "recent_backgrounds": [
+      "neutral-02.jpg"
+    ],
     "cycles": 0
   }
 }
