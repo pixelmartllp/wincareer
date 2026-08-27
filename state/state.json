@@ -48,19 +48,52 @@
       "permalink": "https://www.instagram.com/p/DcgHerPGw5N/",
       "image": "01-w062.jpg",
       "note": "posted from a local test run, not by the workflow - kept because it is live on the Page"
+    },
+    {
+      "date": "2026-08-27",
+      "time": "18:29 IST",
+      "timestamp": "2026-08-27T12:59:05.758997+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w072",
+      "post_id": "1091123227419567_122121542547314742",
+      "permalink": "https://www.facebook.com/1091123227419567_122121542547314742",
+      "image": "01-w072.jpg"
+    },
+    {
+      "date": "2026-08-27",
+      "time": "18:29 IST",
+      "timestamp": "2026-08-27T12:59:22.552540+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w072",
+      "post_id": "17874674964630113",
+      "permalink": "https://www.instagram.com/p/Dci17gNDCKJ/",
+      "image": "01-w072.jpg"
     }
   ],
   "rotation": {
     "used_content": [
       "w036",
       "w008",
-      "w062"
+      "w062",
+      "w072"
     ],
     "recent_backgrounds": [
       "neutral-02.jpg",
-      "neutral-08.jpg"
+      "neutral-08.jpg",
+      "neutral-19.jpg"
     ],
     "cycles": 0
   },
-  "plans": {}
+  "plans": {
+    "2026-08-27": [
+      {
+        "content_id": "w072",
+        "background": "neutral-19.jpg"
+      }
+    ]
+  }
 }
