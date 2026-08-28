@@ -106,6 +106,29 @@
       "content_id": "w038",
       "error": "OAuthException (code 10): (#10) Application does not have permission for this action",
       "image": "01-w038.jpg"
+    },
+    {
+      "date": "2026-08-29",
+      "time": "00:26 IST",
+      "timestamp": "2026-08-28T18:56:39.627720+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w042",
+      "post_id": "1091123227419567_122121685323314742",
+      "permalink": "https://www.facebook.com/1091123227419567_122121685323314742",
+      "image": "01-w042.jpg"
+    },
+    {
+      "date": "2026-08-29",
+      "time": "00:26 IST",
+      "timestamp": "2026-08-28T18:56:44.641231+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": false,
+      "content_id": "w042",
+      "error": "OAuthException (code 10): (#10) Application does not have permission for this action",
+      "image": "01-w042.jpg"
     }
   ],
   "rotation": {
@@ -114,13 +137,15 @@
       "w008",
       "w062",
       "w072",
-      "w038"
+      "w038",
+      "w042"
     ],
     "recent_backgrounds": [
       "neutral-02.jpg",
       "neutral-08.jpg",
       "neutral-19.jpg",
-      "neutral-18.jpg"
+      "neutral-18.jpg",
+      "neutral-09.jpg"
     ],
     "cycles": 0
   },
@@ -135,6 +160,12 @@
       {
         "content_id": "w038",
         "background": "neutral-18.jpg"
+      }
+    ],
+    "2026-08-29": [
+      {
+        "content_id": "w042",
+        "background": "neutral-09.jpg"
       }
     ]
   }
