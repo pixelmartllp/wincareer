@@ -129,6 +129,17 @@
       "content_id": "w042",
       "error": "OAuthException (code 10): (#10) Application does not have permission for this action",
       "image": "01-w042.jpg"
+    },
+    {
+      "date": "2026-08-29",
+      "time": "02:31 IST",
+      "timestamp": "2026-08-28T21:01:32.286709+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": false,
+      "content_id": "w042",
+      "error": "OAuthException (code 10): (#10) Application does not have permission for this action",
+      "image": "01-w042.jpg"
     }
   ],
   "rotation": {
