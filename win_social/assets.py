@@ -21,6 +21,11 @@ from . import brand
 # Ink darker than this reads as "black" and is what vanishes on navy.
 DARK_INK_LEVEL = 90
 
+# How close to grey a dark pixel has to be before it counts as lettering
+# rather than brand colour. The CAREER ribbon's dark red sits well outside
+# this; the black in THE and ACADEMY sits well inside it.
+NEUTRAL_INK_RANGE = 40
+
 # How much of the plate is padding around the mark, as a fraction of the
 # logo's own width. Matches the proportion on the Page's existing creatives.
 PLATE_PAD = 0.10
@@ -71,8 +76,15 @@ def load_logo_light_ink() -> Image.Image:
     for y in range(height):
         for x in range(width):
             r, g, b, a = pixels[x, y]
-            if a > 0 and max(r, g, b) < DARK_INK_LEVEL:
-                pixels[x, y] = (*cream, a)
+            if a == 0 or max(r, g, b) >= DARK_INK_LEVEL:
+                continue
+            # Only *neutral* dark ink is lifted. Judging on brightness alone
+            # also caught the ribbon's dark red and purple, turning their
+            # edges cream and dissolving the CAREER banner into mush. Black
+            # lettering is near-grey; brand colour is not.
+            if max(r, g, b) - min(r, g, b) >= NEUTRAL_INK_RANGE:
+                continue
+            pixels[x, y] = (*cream, a)
     return logo
 
 

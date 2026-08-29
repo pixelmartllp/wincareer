@@ -387,7 +387,7 @@ def crop_to_canvas(image: Image.Image, canvas: tuple[int, int]) -> Image.Image:
     return image.resize(canvas, Image.LANCZOS)
 
 
-def draw_footer(image: Image.Image) -> Image.Image:
+def draw_footer(image: Image.Image, subline: str = "") -> Image.Image:
     """The navy footer: call line on the left, WhatsApp QR on the right.
 
     The bar is tall enough for the QR rather than the other way round. A QR
@@ -432,8 +432,9 @@ def draw_footer(image: Image.Image) -> Image.Image:
     block_top = top + bar_height * 0.24
     draw.text((margin, block_top), brand.CALL_LINE, font=call_font,
               fill=brand.WHITE)
-    draw.text((margin + 2, block_top + bar_height * 0.36), brand.CTA_LINE,
-              font=cta_font, fill=brand.ORANGE_LIGHT)
+    draw.text((margin + 2, block_top + bar_height * 0.36),
+              subline or brand.CTA_LINE, font=cta_font,
+              fill=brand.ORANGE_LIGHT)
     return image
 
 
@@ -773,7 +774,7 @@ LAYOUTS = {
     "photo_dark": _layout_photo_dark,
 }
 
-DEFAULT_LAYOUT = "split_light"
+DEFAULT_LAYOUT = "dark_hero"
 
 
 def render(entry: dict, background: Path, out_path: Path,
@@ -787,3 +788,215 @@ def render(entry: dict, background: Path, out_path: Path,
     result = builder(entry, background, out_path, canvas)
     result.setdefault("layout", layout)
     return result
+
+
+# --------------------------------------------------------------------------
+# Dark hero: near-black ground, stacked hook, the mentor on the right
+# --------------------------------------------------------------------------
+#
+# Built from four references the owner supplied. The palette and the lit-desk
+# composition come from the MET creative; the stacked hook and the free-demo
+# prominence from the SKH one; the restraint - a headline, one supporting
+# line, a badge, a footer, and nothing else - is the COMEX structure with the
+# content stripped back, which is what he asked for.
+
+INK_GROUND = (14, 13, 16)        # near black, very slightly warm
+INK_GLOW = (38, 30, 24)          # the warm pool a desk lamp would throw
+
+HERO_SPLIT = 0.46                # where the mentor's panel begins
+HERO_FADE = 0.16                 # width of the fade into the ground
+HOOK_SIZES = tuple(range(104, 55, -3))
+HOOK_MAX_LINES = 3
+BADGE_TEXT = 0.0165
+MENTOR_DIR = "mentor"
+
+
+def list_mentor_photos() -> list[Path]:
+    folder = brand.ASSETS / MENTOR_DIR
+    if not folder.is_dir():
+        return []
+    return sorted(p for p in folder.iterdir()
+                  if p.suffix.lower() in (".jpg", ".jpeg", ".png"))
+
+
+def _warm_ground(canvas: tuple[int, int]) -> Image.Image:
+    """Near-black with a soft warm pool, the way a lit desk reads."""
+    width, height = canvas
+    ground = Image.new("RGB", canvas, INK_GROUND)
+
+    small = (max(1, width // 6), max(1, height // 6))
+    mask = Image.new("L", small, 0)
+    ImageDraw.Draw(mask).ellipse(
+        [(small[0] * 0.30, small[1] * 0.18),
+         (small[0] * 1.25, small[1] * 0.95)], fill=190)
+    mask = mask.filter(ImageFilter.GaussianBlur(small[0] * 0.30))
+    mask = mask.resize(canvas, Image.BILINEAR)
+
+    return Image.composite(Image.new("RGB", canvas, INK_GLOW), ground, mask)
+
+
+def _mentor_panel(photo: Path, canvas: tuple[int, int],
+                  bottom: int) -> Image.Image:
+    """The mentor on the right, faded into the ground rather than cut out.
+
+    A hard cut-out needs a segmentation model and looks like a sticker when
+    it is even slightly wrong. Her own photograph is already shot against a
+    dark wall, so fading its left edge into the same near-black lets the two
+    become one scene - which is exactly what the MET reference does.
+    """
+    width, height = canvas
+    image = vignette(grade(crop_to_canvas(
+        Image.open(photo).convert("RGB"), (width, height))))
+    image = ImageEnhance.Brightness(image).enhance(0.86)
+
+    mask = Image.new("L", canvas, 0)
+    draw = ImageDraw.Draw(mask)
+    start = int(width * HERO_SPLIT)
+    fade = int(width * HERO_FADE)
+    draw.rectangle([(start + fade, 0), (width, bottom)], fill=255)
+    for step in range(fade):
+        value = int(255 * (step / fade) ** 1.4)
+        draw.rectangle([(start + step, 0), (start + step + 1, bottom)],
+                       fill=value)
+    mask = mask.filter(ImageFilter.GaussianBlur(6))
+
+    return Image.composite(image, _warm_ground(canvas), mask)
+
+
+def fit_hook(draw: ImageDraw.ImageDraw, text: str, max_width: int,
+             max_height: int) -> tuple[Any, list[str], int]:
+    words = text.split()
+    for size in HOOK_SIZES:
+        font = brand.load_font("display", size)
+        if any(draw.textlength(w, font=font) > max_width for w in words):
+            continue
+        lines = _wrap(draw, text, font, max_width)
+        if len(lines) > HOOK_MAX_LINES:
+            continue
+        line_height = int(size * LINE_SPACING)
+        if line_height * len(lines) <= max_height:
+            return font, lines, line_height
+    font = brand.load_font("display", HOOK_SIZES[-1])
+    return (font, _wrap(draw, text, font, max_width)[:HOOK_MAX_LINES],
+            int(HOOK_SIZES[-1] * LINE_SPACING))
+
+
+def _demo_badge(image: Image.Image, x: int, y: int) -> int:
+    """The free-demo pill. Returns its bottom edge.
+
+    The offer gets a shape of its own rather than a line of text. It is the
+    single thing on the creative anyone is being asked to act on, and on the
+    references it is always the loudest object that is not the headline.
+    """
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
+
+    font = brand.load_font("display_alt", int(height * BADGE_TEXT))
+    tracking = height * 0.0016
+    text = brand.CTA_LINE.upper()
+    text_width = tracked_width(draw, text, font, tracking)
+
+    pad_x, pad_y = int(width * 0.030), int(height * 0.013)
+    badge_w = int(text_width) + pad_x * 2
+    badge_h = int(height * BADGE_TEXT * 1.5) + pad_y * 2
+
+    draw.rounded_rectangle([(x, y), (x + badge_w, y + badge_h)],
+                           radius=badge_h // 2, fill=brand.ORANGE)
+    draw_tracked(draw, (x + pad_x, y + pad_y), text, font, brand.WHITE,
+                 tracking)
+    return y + badge_h
+
+
+def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
+                      canvas: str = "portrait") -> dict[str, Any]:
+    size = brand.CANVAS.get(canvas)
+    if not size:
+        raise RenderError(f"Unknown canvas {canvas!r}")
+
+    headline = (entry.get("headline") or "").strip()
+    if not headline:
+        raise RenderError(f"Entry {entry.get('id')} has no headline")
+    accent = (entry.get("accent") or "").strip()
+
+    mentors = list_mentor_photos()
+    if not mentors:
+        raise RenderError(
+            f"No mentor photographs in {brand.ASSETS / MENTOR_DIR}. This "
+            f"layout is built around one - add at least one and prefer "
+            f"several, so consecutive days are not identical.")
+
+    # Rotate through the mentor photographs by date, so a run for the same
+    # day always rebuilds the same creative but consecutive days differ.
+    index = sum(ord(c) for c in str(entry.get("id", ""))) % len(mentors)
+    photo = mentors[index]
+
+    width, height = size
+    margin = int(width * MARGIN_X)
+    footer_top = height - int(height * FOOTER_HEIGHT)
+
+    image = _mentor_panel(photo, size, footer_top)
+    draw = ImageDraw.Draw(image)
+
+    text_right = int(width * HERO_SPLIT + width * 0.02)
+    text_width = text_right - margin
+
+    # Plated, even here. The light-ink variant rescues THE and ACADEMY but
+    # can do nothing for the CAREER ribbon, whose dark red and purple have
+    # almost no contrast against near-black - on the first pass the banner
+    # dissolved into a smudge. The Academy's own flyers plate the logo over
+    # dark photographs for the same reason, so this follows them rather than
+    # inventing a treatment that half works.
+    logo = assets.fit_logo(int(width * 0.30), int(height * 0.095),
+                           on_plate=True)
+    image.paste(logo, (margin, int(height * 0.050)), logo)
+
+    y = int(height * 0.215)
+    chip_font = brand.load_font("body_medium", int(height * CHIP_TEXT))
+    draw_tracked(draw, (margin + 2, y), brand.CATEGORY, chip_font,
+                 brand.ORANGE, height * CHIP_TRACKING)
+    y += int(height * 0.045)
+
+    hook_font, hook_lines, line_height = fit_hook(
+        draw, headline, text_width, int(height * 0.34))
+    for i, line in enumerate(hook_lines):
+        # Last line in orange: the references all land the emphasis at the
+        # end of the stack.
+        colour = brand.ORANGE if i == len(hook_lines) - 1 and \
+            len(hook_lines) > 1 else brand.WHITE
+        draw.text((margin, y), line, font=hook_font, fill=colour)
+        y += line_height
+
+    y += int(height * 0.016)
+    if accent:
+        accent_font, accent_lines, accent_line_h = fit_accent(
+            draw, accent, text_width)
+        for line in accent_lines:
+            draw.text((margin, y), line, font=accent_font, fill=brand.GREY)
+            y += accent_line_h
+        y += int(height * 0.012)
+
+    y = _demo_badge(image, margin, y + int(height * 0.014))
+
+    image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(out_path, "JPEG", quality=92, optimize=True)
+
+    return {
+        "image_path": str(out_path),
+        "background": background.name,
+        "mentor_photo": photo.name,
+        "canvas": canvas,
+        "layout": "dark_hero",
+        "strapline": brand.STRAPLINE,
+        "headline_lines": hook_lines,
+        "headline_size": hook_font.size,
+        "accent_lines": accent_lines if accent else [],
+        "accent_size": accent_font.size if accent else None,
+        "scrim": None,
+        "text_seated": True,
+    }
+
+
+LAYOUTS["dark_hero"] = _layout_dark_hero
