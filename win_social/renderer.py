@@ -807,7 +807,9 @@ HERO_SPLIT = 0.46                # where the mentor's panel begins
 HERO_FADE = 0.16                 # width of the fade into the ground
 HOOK_SIZES = tuple(range(104, 55, -3))
 HOOK_MAX_LINES = 3
-BADGE_TEXT = 0.0165
+BADGE_TEXT = 0.030            # the offer, set to actually be read
+BADGE_SUB_TEXT = 0.0135
+KICKER_TEXT = 0.0215          # "LEARN ENGLISH SPEAKING" - what this even is
 MENTOR_DIR = "mentor"
 
 
@@ -882,28 +884,39 @@ def fit_hook(draw: ImageDraw.ImageDraw, text: str, max_width: int,
 
 
 def _demo_badge(image: Image.Image, x: int, y: int) -> int:
-    """The free-demo pill. Returns its bottom edge.
+    """The free-demo offer block. Returns its bottom edge.
 
-    The offer gets a shape of its own rather than a line of text. It is the
-    single thing on the creative anyone is being asked to act on, and on the
-    references it is always the loudest object that is not the headline.
+    Sized to be seen, not merely present. The first version set this in a
+    small pill and the owner's verdict on the result was that the creative
+    said nothing about free demo classes at all - which was fair: at that
+    size it read as a caption. On both reference ads the offer is the loudest
+    object after the headline, so it is set in the display face and given a
+    line of supporting text underneath.
     """
     draw = ImageDraw.Draw(image)
     width, height = image.size
 
-    font = brand.load_font("display_alt", int(height * BADGE_TEXT))
-    tracking = height * 0.0016
-    text = brand.CTA_LINE.upper()
+    font = brand.load_font("display", int(height * BADGE_TEXT))
+    tracking = height * 0.0010
+    text = brand.OFFER
     text_width = tracked_width(draw, text, font, tracking)
 
-    pad_x, pad_y = int(width * 0.030), int(height * 0.013)
-    badge_w = int(text_width) + pad_x * 2
-    badge_h = int(height * BADGE_TEXT * 1.5) + pad_y * 2
+    sub_font = brand.load_font("body_medium", int(height * BADGE_SUB_TEXT))
+    sub = "Book your seat today"
+    sub_width = draw.textlength(sub, font=sub_font)
+
+    pad_x, pad_y = int(width * 0.034), int(height * 0.016)
+    inner = max(text_width, sub_width)
+    badge_w = int(inner) + pad_x * 2
+    badge_h = (int(height * BADGE_TEXT * 1.15) + int(height * BADGE_SUB_TEXT * 1.9)
+               + pad_y * 2)
 
     draw.rounded_rectangle([(x, y), (x + badge_w, y + badge_h)],
-                           radius=badge_h // 2, fill=brand.ORANGE)
+                           radius=int(height * 0.016), fill=brand.ORANGE)
     draw_tracked(draw, (x + pad_x, y + pad_y), text, font, brand.WHITE,
                  tracking)
+    draw.text((x + pad_x + 2, y + pad_y + int(height * BADGE_TEXT * 1.25)),
+              sub, font=sub_font, fill=(255, 226, 208))
     return y + badge_h
 
 
@@ -950,11 +963,19 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
                            on_plate=True)
     image.paste(logo, (margin, int(height * 0.050)), logo)
 
-    y = int(height * 0.215)
-    chip_font = brand.load_font("body_medium", int(height * CHIP_TEXT))
-    draw_tracked(draw, (margin + 2, y), brand.CATEGORY, chip_font,
-                 brand.ORANGE, height * CHIP_TRACKING)
-    y += int(height * 0.045)
+    # The kicker says what this is before the headline says anything clever.
+    # As a small chip it was invisible, and a reader scrolling past could not
+    # tell the Page taught English at all.
+    y = int(height * 0.200)
+    kicker_font = brand.load_font("display_alt", int(height * KICKER_TEXT))
+    rule_w = int(width * 0.055)
+    draw.rectangle([(margin, y + int(height * 0.012)),
+                    (margin + rule_w, y + int(height * 0.012) + 5)],
+                   fill=brand.ORANGE)
+    draw_tracked(draw, (margin + rule_w + int(width * 0.020), y),
+                 brand.CATEGORY, kicker_font, brand.ORANGE,
+                 height * CHIP_TRACKING)
+    y += int(height * 0.058)
 
     hook_font, hook_lines, line_height = fit_hook(
         draw, headline, text_width, int(height * 0.34))

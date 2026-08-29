@@ -193,7 +193,12 @@ STRAPLINE_EMPHASIS = "CAREER!"
 
 # The category chip. A corporate reader scans for what this is before they
 # read what it promises.
-CATEGORY = "BUSINESS ENGLISH"
+CATEGORY = "LEARN ENGLISH SPEAKING"
+
+# The offer, in the words the owner uses for it. This is the one thing the
+# creative asks anyone to do, so it gets its own object on the canvas rather
+# than a line of small print.
+OFFER = "FREE DEMO CLASSES"
 
 # The three things the Academy actually teaches, for the feature card. Kept
 # to three: the Page's own flyers run five and the row turns into a list
