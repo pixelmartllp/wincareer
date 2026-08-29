@@ -26,6 +26,38 @@ from .meta_api import IST, GraphClient, MetaAPIError
 
 PLATFORMS = ("facebook", "instagram")
 
+# When the audience should see the post, in IST. This is not when the run
+# happens - GitHub's scheduler has fired these crons up to fifteen hours
+# late, which put one day's creative on the Page at 00:26 and the next at
+# 20:02. Facebook can be told to publish at a fixed time, so the runner's
+# arrival time stops mattering.
+POST_HOUR, POST_MINUTE = 9, 0
+
+# Instagram has no scheduling at all - its Content Publishing API only
+# publishes now. So it is simply not allowed to post outside daylight; a run
+# that arrives at 2am defers, and the next one picks it up.
+IG_WINDOW = (7, 21)
+
+
+def preferred_slot(now: datetime | None = None) -> int | None:
+    """Unix time for today's posting slot, or None to publish immediately.
+
+    Returns None once the slot has passed, rather than pushing to tomorrow -
+    tomorrow belongs to tomorrow's creative, and a late post today is far
+    better than two posts colliding on one day.
+    """
+    now = now or datetime.now(tz=IST)
+    slot = now.replace(hour=POST_HOUR, minute=POST_MINUTE, second=0,
+                       microsecond=0)
+    if slot - now >= meta_api.SCHEDULE_MIN:
+        return int(slot.timestamp())
+    return None
+
+
+def instagram_is_awake(now: datetime | None = None) -> bool:
+    now = now or datetime.now(tz=IST)
+    return IG_WINDOW[0] <= now.hour < IG_WINDOW[1]
+
 
 def today() -> str:
     return datetime.now(tz=IST).strftime("%Y-%m-%d")
@@ -183,18 +215,30 @@ def regenerate_item(day: str, index: int, layout: str | None = None,
 # --------------------------------------------------------------------------
 
 def publish_item(day: str, index: int, platforms: tuple[str, ...] = PLATFORMS,
-                 dry_run: bool = True, force: bool = False) -> dict[str, Any]:
-    """Publish one creative. Dry run unless told otherwise."""
+                 dry_run: bool = True, force: bool = False,
+                 immediate: bool = False) -> dict[str, Any]:
+    """Publish one creative. Dry run unless told otherwise.
+
+    `immediate` skips both timing rules: no Facebook scheduling, no Instagram
+    window. It is for a person posting by hand, who has already decided that
+    now is the right moment.
+    """
     batch = load_batch(day)
     item = find_item(batch, index)
     image = Path(item["image_path"])
     if not image.is_file():
         raise FileNotFoundError(f"Creative missing on disk: {image}")
 
+    slot = None if immediate else preferred_slot()
+    ig_awake = immediate or instagram_is_awake()
+
     plan: dict[str, Any] = {
         "date": day, "index": index, "content_id": item["content_id"],
         "image": str(image), "platforms": list(platforms),
         "dry_run": dry_run, "results": {},
+        "facebook_publishes": (meta_api.describe_time(slot) if slot
+                               else "immediately"),
+        "instagram_window_open": ig_awake,
     }
 
     if dry_run:
@@ -207,10 +251,21 @@ def publish_item(day: str, index: int, platforms: tuple[str, ...] = PLATFORMS,
             plan["results"][platform] = {"skipped": "already posted today"}
             continue
 
+        if platform == "instagram" and not ig_awake:
+            # Deferred, not failed. No ledger row: nothing was attempted, and
+            # a failure row here would both mislead the next reader and turn
+            # a correctly-behaving run red.
+            item["status"][platform] = "deferred"
+            plan["results"][platform] = {
+                "deferred": f"outside the {IG_WINDOW[0]:02d}:00-"
+                            f"{IG_WINDOW[1]:02d}:00 IST window"}
+            continue
+
         caption = item[f"caption_{platform}"]
         try:
             if platform == "facebook":
-                response = client.post_photo(image, caption)
+                response = client.post_photo(image, caption,
+                                             schedule_unix=slot)
                 post_id = response.get("post_id")
                 permalink = response.get("permalink")
             else:
@@ -219,12 +274,15 @@ def publish_item(day: str, index: int, platforms: tuple[str, ...] = PLATFORMS,
                 post_id = response.get("media_id")
                 permalink = response.get("permalink")
 
-            item["status"][platform] = "posted"
+            scheduled_for = response.get("scheduled_for")
+            item["status"][platform] = "scheduled" if scheduled_for else "posted"
             plan["results"][platform] = {"ok": True, "post_id": post_id,
-                                         "permalink": permalink}
+                                         "permalink": permalink,
+                                         "scheduled_for": scheduled_for}
             state.record(platform, "creative", ok=True,
                          content_id=item["content_id"], post_id=post_id,
-                         permalink=permalink, image=image.name)
+                         permalink=permalink, scheduled_for=scheduled_for,
+                         image=image.name)
         except (MetaAPIError, ConfigError, ValueError) as exc:
             item["status"][platform] = "failed"
             plan["results"][platform] = {"ok": False, "error": str(exc)}
@@ -238,7 +296,8 @@ def publish_item(day: str, index: int, platforms: tuple[str, ...] = PLATFORMS,
 
 def publish_day(day: str | None = None, platforms: tuple[str, ...] = PLATFORMS,
                 dry_run: bool = True, force: bool = False,
-                stop_on_error: bool = False) -> dict[str, Any]:
+                stop_on_error: bool = False,
+                immediate: bool = False) -> dict[str, Any]:
     """Publish a whole day's batch."""
     day = day or today()
     batch = load_batch(day)
@@ -247,7 +306,8 @@ def publish_day(day: str | None = None, platforms: tuple[str, ...] = PLATFORMS,
                                "platforms": list(platforms), "items": []}
     for item in batch["items"]:
         result = publish_item(day, item["index"], platforms=platforms,
-                              dry_run=dry_run, force=force)
+                              dry_run=dry_run, force=force,
+                              immediate=immediate)
         summary["items"].append(result)
         if stop_on_error and any(
                 r.get("ok") is False for r in result["results"].values()):
@@ -258,7 +318,12 @@ def publish_day(day: str | None = None, platforms: tuple[str, ...] = PLATFORMS,
                  for r in i["results"].values() if r.get("ok"))
     failed = sum(1 for i in summary["items"]
                  for r in i["results"].values() if r.get("ok") is False)
+    deferred = sum(1 for i in summary["items"]
+                   for r in i["results"].values() if r.get("deferred"))
     summary["posted"] = posted
     summary["failed"] = failed
-    summary["ok"] = failed == 0 and (dry_run or posted > 0)
+    summary["deferred"] = deferred
+    # A deferral is the system working, so it must not colour the run red.
+    # Only a real failure, or a run that managed nothing at all, does.
+    summary["ok"] = failed == 0 and (dry_run or posted > 0 or deferred > 0)
     return summary

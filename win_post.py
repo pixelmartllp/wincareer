@@ -171,7 +171,7 @@ def cmd_publish(args) -> int:
     platforms = tuple(p.strip() for p in args.platforms.split(",") if p.strip())         if args.platforms else pipeline.PLATFORMS
     summary = pipeline.publish_day(
         args.date or None, platforms=platforms,
-        dry_run=not args.confirm, force=args.force)
+        dry_run=not args.confirm, force=args.force, immediate=args.now)
     show(summary)
     if not args.confirm:
         print("\nDry run. Add --confirm to publish.", file=sys.stderr)
@@ -309,6 +309,9 @@ def build_parser() -> argparse.ArgumentParser:
                          help="facebook,instagram (default both)")
     publish.add_argument("--force", action="store_true",
                          help="post again even if already posted today")
+    publish.add_argument("--now", action="store_true",
+                         help="ignore the 09:00 IST slot and the Instagram "
+                              "window; post this moment")
     publish.add_argument("--confirm", action="store_true")
     publish.set_defaults(func=cmd_publish)
 
