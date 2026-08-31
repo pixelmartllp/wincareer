@@ -837,8 +837,35 @@ def _warm_ground(canvas: tuple[int, int]) -> Image.Image:
     return Image.composite(Image.new("RGB", canvas, INK_GLOW), ground, mask)
 
 
+def mentor_variant(key: str, photos: list[Path]) -> tuple[Path, str, float]:
+    """Pick the photograph, the side it sits on, and how tight the crop is.
+
+    One photograph does not have to mean one composition. Varying the side of
+    the frame and the crop gives four visibly different creatives from a
+    single source, which is what keeps consecutive days from looking like a
+    reprint while there is only one photograph to work with.
+
+    The photograph itself is never mirrored: the Academy's logo is on the
+    wall behind her, and flipping it reverses the lettering.
+    """
+    seed = sum(ord(c) for c in str(key))
+    photo = photos[seed % len(photos)]
+    zoom = (1.0, 1.14, 1.07, 1.21)[seed % 4]
+
+    # Side is fixed to the right, and that is a limitation of the source
+    # rather than a choice. Alternating it was tried: the only mentor
+    # photograph has her standing in the right of the frame, so masking the
+    # left half showed the wall behind her with her head cropped off. The
+    # left path is kept because a photograph composed the other way would
+    # use it correctly - it is simply not selectable automatically without
+    # knowing where the subject stands.
+    side = "right"
+    return photo, side, zoom
+
+
 def _mentor_panel(photo: Path, canvas: tuple[int, int],
-                  bottom: int) -> Image.Image:
+                  bottom: int, side: str = "right",
+                  zoom: float = 1.0) -> Image.Image:
     """The mentor on the right, faded into the ground rather than cut out.
 
     A hard cut-out needs a segmentation model and looks like a sticker when
@@ -847,19 +874,31 @@ def _mentor_panel(photo: Path, canvas: tuple[int, int],
     become one scene - which is exactly what the MET reference does.
     """
     width, height = canvas
-    image = vignette(grade(crop_to_canvas(
-        Image.open(photo).convert("RGB"), (width, height))))
+    source = Image.open(photo).convert("RGB")
+    if zoom > 1.0:
+        w, h = source.size
+        inset_x, inset_y = int(w * (1 - 1 / zoom) / 2), int(h * (1 - 1 / zoom) / 2)
+        source = source.crop((inset_x, inset_y, w - inset_x, h - inset_y))
+
+    image = vignette(grade(crop_to_canvas(source, (width, height))))
     image = ImageEnhance.Brightness(image).enhance(0.86)
 
     mask = Image.new("L", canvas, 0)
     draw = ImageDraw.Draw(mask)
-    start = int(width * HERO_SPLIT)
     fade = int(width * HERO_FADE)
-    draw.rectangle([(start + fade, 0), (width, bottom)], fill=255)
-    for step in range(fade):
-        value = int(255 * (step / fade) ** 1.4)
-        draw.rectangle([(start + step, 0), (start + step + 1, bottom)],
-                       fill=value)
+
+    if side == "right":
+        start = int(width * HERO_SPLIT)
+        draw.rectangle([(start + fade, 0), (width, bottom)], fill=255)
+        for step in range(fade):
+            draw.rectangle([(start + step, 0), (start + step + 1, bottom)],
+                           fill=int(255 * (step / fade) ** 1.4))
+    else:
+        end = int(width * (1 - HERO_SPLIT))
+        draw.rectangle([(0, 0), (end - fade, bottom)], fill=255)
+        for step in range(fade):
+            draw.rectangle([(end - step, 0), (end - step + 1, bottom)],
+                           fill=int(255 * (step / fade) ** 1.4))
     mask = mask.filter(ImageFilter.GaussianBlur(6))
 
     return Image.composite(image, _warm_ground(canvas), mask)
@@ -940,18 +979,18 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
 
     # Rotate through the mentor photographs by date, so a run for the same
     # day always rebuilds the same creative but consecutive days differ.
-    index = sum(ord(c) for c in str(entry.get("id", ""))) % len(mentors)
-    photo = mentors[index]
+    photo, side, zoom = mentor_variant(entry.get("id", ""), mentors)
 
     width, height = size
     margin = int(width * MARGIN_X)
     footer_top = height - int(height * FOOTER_HEIGHT)
 
-    image = _mentor_panel(photo, size, footer_top)
+    image = _mentor_panel(photo, size, footer_top, side=side, zoom=zoom)
     draw = ImageDraw.Draw(image)
 
-    text_right = int(width * HERO_SPLIT + width * 0.02)
-    text_width = text_right - margin
+    # When the mentor sits on the left, the type moves to the right half.
+    text_width = int(width * HERO_SPLIT + width * 0.02) - margin
+    margin = margin if side == "right" else width - margin - text_width
 
     # Plated, even here. The light-ink variant rescues THE and ACADEMY but
     # can do nothing for the CAREER ribbon, whose dark red and purple have
@@ -1008,6 +1047,8 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
         "image_path": str(out_path),
         "background": background.name,
         "mentor_photo": photo.name,
+        "mentor_side": side,
+        "mentor_zoom": zoom,
         "canvas": canvas,
         "layout": "dark_hero",
         "strapline": brand.STRAPLINE,
