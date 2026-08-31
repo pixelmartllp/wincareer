@@ -141,7 +141,11 @@ def main() -> int:
 
         for photo in photos:
             pid = str(photo.get("id"))
-            if pid in existing:
+            # Known *and* still on disk. Checking the manifest alone would
+            # skip anything whose file had been cleared out, leaving an entry
+            # that can never be re-downloaded and an install that fails on a
+            # missing file.
+            if pid in existing and (STAGING / existing[pid]["file"]).is_file():
                 continue
             width, height = photo.get("width", 0), photo.get("height", 0)
             if width < MIN_WIDTH or height < MIN_HEIGHT:
