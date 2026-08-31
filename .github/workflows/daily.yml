@@ -11,9 +11,19 @@ name: Daily post
 
 on:
   schedule:
-    - cron: '30 3 * * *'    # 09:00 IST
-    - cron: '30 6 * * *'    # 12:00 IST - catch-up
-    - cron: '0 10 * * *'    # 15:30 IST - last chance
+    # These times are not when the post appears - the pipeline decides that,
+    # and aims for 09:00 IST. These are set early enough that the runner is
+    # awake *before* 09:00 IST despite the drift, because the scheduling can
+    # only be used by a run that arrives while the slot is still ahead.
+    #
+    # Measured drift on this repo, 29-30 Aug: 4.5 to 6 hours. The old crons
+    # asked for 09:00, 12:00 and 15:30 IST; the earliest run of the day
+    # actually landed at 14:55 IST, so the 09:00 slot had always passed and
+    # every post went out mid-afternoon.
+    - cron: '35 18 * * *'   # 00:05 IST
+    - cron: '35 21 * * *'   # 03:05 IST
+    - cron: '5 1 * * *'     # 06:35 IST
+    - cron: '5 4 * * *'     # 09:35 IST - last resort, posts immediately
   workflow_dispatch:
     inputs:
       count:
