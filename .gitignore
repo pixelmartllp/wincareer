@@ -9,6 +9,11 @@ output/
 # the contact sheet belongs in the repo - that lands in assets/backgrounds/.
 assets/_staging/
 
+# Reference images dropped in during a conversation. Useful to look at,
+# nobody's code reads them, and on a public repo they are the owner's own
+# files sitting in the open for no reason.
+sample/
+
 # Ad-hoc images for one-off posts.
 media/*
 !media/.gitkeep

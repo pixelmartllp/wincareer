@@ -810,6 +810,7 @@ HOOK_MAX_LINES = 3
 BADGE_TEXT = 0.030            # the offer, set to actually be read
 BADGE_SUB_TEXT = 0.0135
 KICKER_TEXT = 0.0215          # "LEARN ENGLISH SPEAKING" - what this even is
+OFFER_TILT = -4.5             # degrees; past ~8 the block reads as a sticker
 MENTOR_DIR = "mentor"
 
 
@@ -920,6 +921,50 @@ def fit_hook(draw: ImageDraw.ImageDraw, text: str, max_width: int,
     font = brand.load_font("display", HOOK_SIZES[-1])
     return (font, _wrap(draw, text, font, max_width)[:HOOK_MAX_LINES],
             int(HOOK_SIZES[-1] * LINE_SPACING))
+
+
+def _angled_offer(image: Image.Image, x: int, y: int) -> int:
+    """The offer as a tilted block. Returns its bottom edge.
+
+    Borrowed from the NS Study reference the owner sent, where the offer is a
+    rotated slab and is the loudest thing on the canvas. The tilt is what does
+    the work: everything else on the creative sits on a horizontal, so a few
+    degrees off makes the block read as applied rather than laid out.
+
+    Kept to a small angle. Past about eight degrees the type starts to look
+    like a sticker rather than a designed element, and the bounding box eats
+    into the headline above it.
+    """
+    width, height = image.size
+
+    font = brand.load_font("display", int(height * BADGE_TEXT))
+    sub_font = brand.load_font("body_medium", int(height * BADGE_SUB_TEXT))
+    tracking = height * 0.0010
+    sub = "Book your seat today"
+
+    probe = ImageDraw.Draw(image)
+    text_width = tracked_width(probe, brand.OFFER, font, tracking)
+    inner = max(text_width, probe.textlength(sub, font=sub_font))
+
+    pad_x, pad_y = int(width * 0.034), int(height * 0.016)
+    badge_w = int(inner) + pad_x * 2
+    badge_h = (int(height * BADGE_TEXT * 1.15)
+               + int(height * BADGE_SUB_TEXT * 1.9) + pad_y * 2)
+
+    # Drawn upright on its own transparent layer, then rotated - rotating the
+    # finished text keeps the letterforms clean, where drawing on an angle
+    # would have to fake it per glyph.
+    badge = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
+    bd = ImageDraw.Draw(badge)
+    bd.rounded_rectangle([(0, 0), (badge_w - 1, badge_h - 1)],
+                         radius=int(height * 0.010), fill=(*brand.ORANGE, 255))
+    draw_tracked(bd, (pad_x, pad_y), brand.OFFER, font, brand.WHITE, tracking)
+    bd.text((pad_x + 2, pad_y + int(height * BADGE_TEXT * 1.25)), sub,
+            font=sub_font, fill=(255, 226, 208))
+
+    badge = badge.rotate(OFFER_TILT, resample=Image.BICUBIC, expand=True)
+    image.paste(badge, (x - int(width * 0.012), y), badge)
+    return y + badge.height
 
 
 def _demo_badge(image: Image.Image, x: int, y: int) -> int:
@@ -1035,7 +1080,7 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
             y += accent_line_h
         y += int(height * 0.012)
 
-    y = _demo_badge(image, margin, y + int(height * 0.014))
+    y = _angled_offer(image, margin, y + int(height * 0.014))
 
     image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
 
