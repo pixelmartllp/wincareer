@@ -1128,7 +1128,7 @@ CARD_HEAD_SIZES = tuple(range(112, 59, -3))
 CARD_HEAD_MAX_LINES = 3
 
 
-def _paper_ground(canvas: tuple[int, int]) -> Image.Image:
+def _paper_ground(canvas: tuple[int, int], dark: bool = False) -> Image.Image:
     """Near-white, with two soft brand-coloured shapes.
 
     Very low contrast on purpose. They exist so the ground is not a blank
@@ -1136,22 +1136,28 @@ def _paper_ground(canvas: tuple[int, int]) -> Image.Image:
     competing with the type, which is the only thing on this layout.
     """
     width, height = canvas
-    ground = Image.new("RGB", canvas, brand.PAPER_WARM)
+    ground = Image.new("RGB", canvas, INK_GROUND if dark else brand.PAPER_WARM)
     layer = Image.new("RGBA", canvas, (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
 
+    # Barely-there on both grounds. The first dark pass used 46/34, on the
+    # theory that a tint which works on paper would vanish into near-black.
+    # It did not vanish - it turned into a large brown stain in the corner.
+    # Dark needs *less*, not more, because there is no detail for it to hide
+    # behind.
+    warm, cool = (16, 12) if dark else (26, 20)
     draw.ellipse([(width * 0.52, -height * 0.10),
                   (width * 1.30, height * 0.42)],
-                 fill=(*brand.ORANGE, 26))
+                 fill=(*brand.ORANGE, warm))
     draw.ellipse([(-width * 0.28, height * 0.52),
                   (width * 0.36, height * 1.02)],
-                 fill=(*brand.BLUE, 20))
+                 fill=(*brand.BLUE, cool))
 
     layer = layer.filter(ImageFilter.GaussianBlur(width * 0.02))
     return Image.alpha_composite(ground.convert("RGBA"), layer).convert("RGB")
 
 
-def _corner_tag(image: Image.Image) -> None:
+def _corner_tag(image: Image.Image, dark: bool = False) -> None:
     """The strapline, right-aligned top corner, with a rule beside it.
 
     Two lines because it is a two-clause line, and splitting it on the comma
@@ -1162,7 +1168,8 @@ def _corner_tag(image: Image.Image) -> None:
     margin = int(width * MARGIN_X)
 
     head, tail = brand.STRAPLINE.split(",", 1)
-    lines = [(head.strip() + ",", brand.NAVY), (tail.strip(), brand.ORANGE)]
+    lines = [(head.strip() + ",", brand.WHITE if dark else brand.NAVY),
+             (tail.strip(), brand.ORANGE_LIGHT if dark else brand.ORANGE)]
 
     font = brand.load_font("body_medium", int(height * CARD_TAG_TEXT))
     line_h = int(height * CARD_TAG_TEXT * 1.55)
@@ -1180,7 +1187,7 @@ def _corner_tag(image: Image.Image) -> None:
                    fill=brand.ORANGE)
 
 
-def _feature_row(image: Image.Image, top: int) -> int:
+def _feature_row(image: Image.Image, top: int, dark: bool = False) -> int:
     """The three things taught, spread across the full measure."""
     draw = ImageDraw.Draw(image)
     width, height = image.size
@@ -1196,11 +1203,12 @@ def _feature_row(image: Image.Image, top: int) -> int:
     gap = (span - sum(widths)) / (len(labels) - 1)
 
     draw.rectangle([(margin, top), (width - margin, top + 2)],
-                   fill=(214, 216, 220))
+                   fill=(58, 56, 62) if dark else (214, 216, 220))
     y = top + int(height * 0.022)
     x = margin
     for i, (label, w) in enumerate(zip(labels, widths)):
-        draw_tracked(draw, (x, y), label, font, brand.NAVY, tracking)
+        draw_tracked(draw, (x, y), label, font,
+                     brand.OFF_WHITE if dark else brand.NAVY, tracking)
         if i < len(labels) - 1:
             cx = x + w + gap / 2
             cy = y + size * 0.55
@@ -1210,8 +1218,8 @@ def _feature_row(image: Image.Image, top: int) -> int:
     return y + int(size * 1.6)
 
 
-def _layout_light_card(entry: dict, background: Path, out_path: Path,
-                       canvas: str = "portrait") -> dict[str, Any]:
+def _layout_card(entry: dict, background: Path, out_path: Path,
+                 canvas: str = "portrait", dark: bool = False) -> dict[str, Any]:
     """A creative with no photograph in it at all.
 
     `background` is accepted and ignored, so this layout is a drop-in for the
@@ -1231,13 +1239,15 @@ def _layout_light_card(entry: dict, background: Path, out_path: Path,
     margin = int(width * MARGIN_X)
     footer_top = height - int(height * FOOTER_HEIGHT)
 
-    image = _paper_ground(size)
+    image = _paper_ground(size, dark=dark)
     draw = ImageDraw.Draw(image)
 
+    # Bare on paper, plated on near-black - the mark carries black lettering
+    # and a dark ribbon, neither of which survives an unlit ground.
     logo = assets.fit_logo(int(width * 0.30), int(height * 0.100),
-                           on_plate=False)
+                           on_plate=dark)
     image.paste(logo, (margin, int(height * 0.052)), logo)
-    _corner_tag(image)
+    _corner_tag(image, dark=dark)
 
     # Started at 0.215 and left a quarter of the canvas blank between the
     # offer and the feature row, which reads as a mistake rather than as
@@ -1272,8 +1282,8 @@ def _layout_light_card(entry: dict, background: Path, out_path: Path,
         line_height = int(CARD_HEAD_SIZES[-1] * LINE_SPACING)
 
     for i, line in enumerate(head_lines):
-        colour = brand.ORANGE if i == len(head_lines) - 1 and \
-            len(head_lines) > 1 else brand.NAVY
+        last = i == len(head_lines) - 1 and len(head_lines) > 1
+        colour = brand.ORANGE if last else (brand.WHITE if dark else brand.NAVY)
         draw.text((margin, y), line, font=head_font, fill=colour)
         y += line_height
 
@@ -1283,7 +1293,7 @@ def _layout_light_card(entry: dict, background: Path, out_path: Path,
             draw, accent, int(text_width * 0.72))
         for line in accent_lines:
             draw.text((margin, y), line, font=accent_font,
-                      fill=brand.NAVY_SOFT)
+                      fill=brand.GREY if dark else brand.NAVY_SOFT)
             y += accent_line_h
         y += int(height * 0.014)
     else:
@@ -1291,7 +1301,7 @@ def _layout_light_card(entry: dict, background: Path, out_path: Path,
 
     y = _angled_offer(image, margin, y + int(height * 0.016))
 
-    _feature_row(image, footer_top - int(height * 0.072))
+    _feature_row(image, footer_top - int(height * 0.072), dark=dark)
     image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
 
     out_path = Path(out_path)
@@ -1302,7 +1312,7 @@ def _layout_light_card(entry: dict, background: Path, out_path: Path,
         "image_path": str(out_path),
         "background": Path(background).name,
         "canvas": canvas,
-        "layout": "light_card",
+        "layout": "dark_card" if dark else "light_card",
         "strapline": brand.STRAPLINE,
         "headline_lines": head_lines,
         "headline_size": head_font.size,
@@ -1315,4 +1325,6 @@ def _layout_light_card(entry: dict, background: Path, out_path: Path,
     }
 
 
-LAYOUTS["light_card"] = _layout_light_card
+LAYOUTS["light_card"] = _layout_card
+LAYOUTS["dark_card"] = lambda e, b, o, c="portrait": _layout_card(e, b, o, c,
+                                                                 dark=True)
