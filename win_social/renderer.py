@@ -1107,3 +1107,212 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
 
 
 LAYOUTS["dark_hero"] = _layout_dark_hero
+
+
+# --------------------------------------------------------------------------
+# Light card: no photograph at all, type and shape doing the work
+# --------------------------------------------------------------------------
+#
+# Modelled on the NS Study creative the owner sent: near-white ground, logo
+# top left, a two-line tag top right, a stacked two-tone headline, the offer
+# as a tilted slab, a feature row, and a contact bar.
+#
+# The reference fills its right side with a styled product photograph. There
+# is no equivalent in this brand's assets, so that space is given to the
+# offer and to two soft shapes instead. Faking a product shot with clip art
+# would look exactly like faking a product shot.
+
+CARD_KICKER = 0.0195
+CARD_TAG_TEXT = 0.0150
+CARD_HEAD_SIZES = tuple(range(112, 59, -3))
+CARD_HEAD_MAX_LINES = 3
+
+
+def _paper_ground(canvas: tuple[int, int]) -> Image.Image:
+    """Near-white, with two soft brand-coloured shapes.
+
+    Very low contrast on purpose. They exist so the ground is not a blank
+    rectangle; the moment they are strong enough to notice they start
+    competing with the type, which is the only thing on this layout.
+    """
+    width, height = canvas
+    ground = Image.new("RGB", canvas, brand.PAPER_WARM)
+    layer = Image.new("RGBA", canvas, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+
+    draw.ellipse([(width * 0.52, -height * 0.10),
+                  (width * 1.30, height * 0.42)],
+                 fill=(*brand.ORANGE, 26))
+    draw.ellipse([(-width * 0.28, height * 0.52),
+                  (width * 0.36, height * 1.02)],
+                 fill=(*brand.BLUE, 20))
+
+    layer = layer.filter(ImageFilter.GaussianBlur(width * 0.02))
+    return Image.alpha_composite(ground.convert("RGBA"), layer).convert("RGB")
+
+
+def _corner_tag(image: Image.Image) -> None:
+    """The strapline, right-aligned top corner, with a rule beside it.
+
+    Two lines because it is a two-clause line, and splitting it on the comma
+    is what lets the emphasis sit on its own row the way the reference does.
+    """
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
+    margin = int(width * MARGIN_X)
+
+    head, tail = brand.STRAPLINE.split(",", 1)
+    lines = [(head.strip() + ",", brand.NAVY), (tail.strip(), brand.ORANGE)]
+
+    font = brand.load_font("body_medium", int(height * CARD_TAG_TEXT))
+    line_h = int(height * CARD_TAG_TEXT * 1.55)
+    top = int(height * 0.062)
+    right = width - margin
+
+    for i, (text, colour) in enumerate(lines):
+        w = draw.textlength(text, font=font)
+        draw.text((right - w, top + i * line_h), text, font=font, fill=colour)
+
+    rule_x = right - max(draw.textlength(t, font=font) for t, _ in lines)
+    draw.rectangle([(rule_x - int(width * 0.022), top),
+                    (rule_x - int(width * 0.022) + 5,
+                     top + line_h * len(lines) - int(height * 0.006))],
+                   fill=brand.ORANGE)
+
+
+def _feature_row(image: Image.Image, top: int) -> int:
+    """The three things taught, spread across the full measure."""
+    draw = ImageDraw.Draw(image)
+    width, height = image.size
+    margin = int(width * MARGIN_X)
+
+    labels = [f.upper() for f in brand.FEATURES]
+    size = int(height * 0.0150)
+    font = brand.load_font("body_medium", size)
+    tracking = height * 0.0012
+
+    widths = [tracked_width(draw, l, font, tracking) for l in labels]
+    span = width - margin * 2
+    gap = (span - sum(widths)) / (len(labels) - 1)
+
+    draw.rectangle([(margin, top), (width - margin, top + 2)],
+                   fill=(214, 216, 220))
+    y = top + int(height * 0.022)
+    x = margin
+    for i, (label, w) in enumerate(zip(labels, widths)):
+        draw_tracked(draw, (x, y), label, font, brand.NAVY, tracking)
+        if i < len(labels) - 1:
+            cx = x + w + gap / 2
+            cy = y + size * 0.55
+            draw.ellipse([(cx - 5, cy - 5), (cx + 5, cy + 5)],
+                         fill=brand.ORANGE)
+        x += w + gap
+    return y + int(size * 1.6)
+
+
+def _layout_light_card(entry: dict, background: Path, out_path: Path,
+                       canvas: str = "portrait") -> dict[str, Any]:
+    """A creative with no photograph in it at all.
+
+    `background` is accepted and ignored, so this layout is a drop-in for the
+    others in the pipeline - a day pinned to a photograph still renders, it
+    just does not use it.
+    """
+    size = brand.CANVAS.get(canvas)
+    if not size:
+        raise RenderError(f"Unknown canvas {canvas!r}")
+
+    headline = (entry.get("headline") or "").strip()
+    if not headline:
+        raise RenderError(f"Entry {entry.get('id')} has no headline")
+    accent = (entry.get("accent") or "").strip()
+
+    width, height = size
+    margin = int(width * MARGIN_X)
+    footer_top = height - int(height * FOOTER_HEIGHT)
+
+    image = _paper_ground(size)
+    draw = ImageDraw.Draw(image)
+
+    logo = assets.fit_logo(int(width * 0.30), int(height * 0.100),
+                           on_plate=False)
+    image.paste(logo, (margin, int(height * 0.052)), logo)
+    _corner_tag(image)
+
+    # Started at 0.215 and left a quarter of the canvas blank between the
+    # offer and the feature row, which reads as a mistake rather than as
+    # breathing room. Dropped so the space is shared above and below.
+    y = int(height * 0.295)
+    kicker_font = brand.load_font("display_alt", int(height * CARD_KICKER))
+    rule_w = int(width * 0.055)
+    draw.rectangle([(margin, y + int(height * 0.011)),
+                    (margin + rule_w, y + int(height * 0.011) + 5)],
+                   fill=brand.ORANGE)
+    draw_tracked(draw, (margin + rule_w + int(width * 0.020), y),
+                 brand.CATEGORY, kicker_font, brand.ORANGE,
+                 height * CHIP_TRACKING)
+    y += int(height * 0.055)
+
+    text_width = width - margin * 2
+    head_font, head_lines, line_height = None, [], 0
+    words = headline.split()
+    for cand in CARD_HEAD_SIZES:
+        font = brand.load_font("display", cand)
+        if any(draw.textlength(w, font=font) > text_width for w in words):
+            continue
+        lines = _wrap(draw, headline, font, text_width)
+        if len(lines) <= CARD_HEAD_MAX_LINES:
+            head_font, head_lines = font, lines
+            line_height = int(cand * LINE_SPACING)
+            break
+    if not head_font:
+        head_font = brand.load_font("display", CARD_HEAD_SIZES[-1])
+        head_lines = _wrap(draw, headline, head_font,
+                           text_width)[:CARD_HEAD_MAX_LINES]
+        line_height = int(CARD_HEAD_SIZES[-1] * LINE_SPACING)
+
+    for i, line in enumerate(head_lines):
+        colour = brand.ORANGE if i == len(head_lines) - 1 and \
+            len(head_lines) > 1 else brand.NAVY
+        draw.text((margin, y), line, font=head_font, fill=colour)
+        y += line_height
+
+    y += int(height * 0.014)
+    if accent:
+        accent_font, accent_lines, accent_line_h = fit_accent(
+            draw, accent, int(text_width * 0.72))
+        for line in accent_lines:
+            draw.text((margin, y), line, font=accent_font,
+                      fill=brand.NAVY_SOFT)
+            y += accent_line_h
+        y += int(height * 0.014)
+    else:
+        accent_font, accent_lines = None, []
+
+    y = _angled_offer(image, margin, y + int(height * 0.016))
+
+    _feature_row(image, footer_top - int(height * 0.072))
+    image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(out_path, "JPEG", quality=92, optimize=True)
+
+    return {
+        "image_path": str(out_path),
+        "background": Path(background).name,
+        "canvas": canvas,
+        "layout": "light_card",
+        "strapline": brand.STRAPLINE,
+        "headline_lines": head_lines,
+        "headline_size": head_font.size,
+        "accent_lines": accent_lines,
+        "accent_size": accent_font.size if accent_font else None,
+        # Nothing is measured here: every element sits on a flat brand colour,
+        # so contrast is fixed by construction.
+        "scrim": None,
+        "text_seated": True,
+    }
+
+
+LAYOUTS["light_card"] = _layout_light_card
