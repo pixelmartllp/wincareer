@@ -233,6 +233,45 @@ def photo_theme(path: Path) -> str | None:
     return prefix if prefix in known_themes() else None
 
 
+HERO_DIR = "hero"
+
+
+def list_hero() -> list[Path]:
+    """Photographs composed for the dark hero layout.
+
+    Kept apart from the main pool because that layout fades its left 46% into
+    the ground: a photograph whose subject sits centre or left comes back with
+    a face sliced in half. Everything here is framed subject-right with dark
+    empty space on the left, which the general pool is not.
+    """
+    folder = brand.ASSETS / HERO_DIR
+    if not folder.is_dir():
+        return []
+    return sorted(p for p in folder.iterdir()
+                  if p.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp"))
+
+
+def pick_hero(theme: str | None = None, exclude: list[str] | None = None,
+              seed: int | None = None) -> Path | None:
+    """A hero photograph for a theme, or None if the pool is empty."""
+    import random
+
+    photos = list_hero()
+    if not photos:
+        return None
+
+    held = set(exclude or [])
+    rng = random.Random(seed)
+    themed = [p for p in photos if theme and photo_theme(p) == theme]
+    for candidates in (themed, photos):
+        fresh = [p for p in candidates if p.name not in held]
+        if fresh:
+            return rng.choice(fresh)
+        if candidates:
+            return rng.choice(candidates)
+    return None
+
+
 def pick_background(theme: str | None = None,
                     exclude: list[str] | None = None,
                     seed: int | None = None) -> Path:

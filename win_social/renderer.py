@@ -838,6 +838,73 @@ def _warm_ground(canvas: tuple[int, int]) -> Image.Image:
     return Image.composite(Image.new("RGB", canvas, INK_GLOW), ground, mask)
 
 
+MENTOR_BADGE = 0.105             # badge diameter as a fraction of the canvas
+MENTOR_FACE = (0.64, 0.23)       # where her face sits in the mentor photo
+MENTOR_FACE_BOX = 0.30           # crop size, as a fraction of its height
+
+
+def _badge_photo_name() -> str | None:
+    photos = list_mentor_photos()
+    return photos[0].name if photos else None
+
+
+def _mentor_badge(image: Image.Image, footer_top: int) -> None:
+    """A small circular portrait of the mentor, with her name beside it.
+
+    She used to be the whole right-hand panel. That made every post a
+    portrait of the same person, at the same desk, in the same cardigan -
+    and it left no room for a picture of what the line is actually about.
+    Small and circular keeps the Academy identifiable without spending the
+    frame on it.
+
+    Silently skipped when there is no photograph: this is identity, not
+    structure, and a missing file should not stop the day going out.
+    """
+    photos = list_mentor_photos()
+    if not photos:
+        return
+
+    width, height = image.size
+    side = int(height * MENTOR_BADGE)
+    margin = int(width * MARGIN_X)
+
+    portrait = Image.open(photos[0]).convert("RGB")
+    w, h = portrait.size
+    # Crop tight on the face. The first version took the largest square from
+    # the top of the frame, which on this photograph is mostly the logo on
+    # the wall behind her - a badge of the wall, not of the mentor. These
+    # fractions describe where she is in *this* photograph; a replacement
+    # shot may need them moved.
+    box = int(h * MENTOR_FACE_BOX)
+    cx, cy = int(w * MENTOR_FACE[0]), int(h * MENTOR_FACE[1])
+    left = max(0, min(w - box, cx - box // 2))
+    top = max(0, min(h - box, cy - box // 2))
+    portrait = portrait.crop((left, top, left + box, top + box))
+    portrait = portrait.resize((side, side), Image.LANCZOS)
+
+    mask = Image.new("L", (side * 4, side * 4), 0)
+    ImageDraw.Draw(mask).ellipse([(0, 0), (side * 4 - 1, side * 4 - 1)],
+                                 fill=255)
+    mask = mask.resize((side, side), Image.LANCZOS)   # cheap antialiasing
+
+    ring = Image.new("RGBA", (side + 8, side + 8), (0, 0, 0, 0))
+    ImageDraw.Draw(ring).ellipse([(0, 0), (side + 7, side + 7)],
+                                 fill=(*brand.ORANGE, 255))
+    x = margin
+    y = footer_top - side - int(height * 0.055)
+    image.paste(ring, (x - 4, y - 4), ring)
+    image.paste(portrait, (x, y), mask)
+
+    draw = ImageDraw.Draw(image)
+    name_font = brand.load_font("body_medium", int(height * 0.0155))
+    role_font = brand.load_font("body", int(height * 0.0125))
+    text_x = x + side + int(width * 0.022)
+    draw.text((text_x, y + side * 0.26), brand.MENTOR, font=name_font,
+              fill=brand.WHITE)
+    draw.text((text_x, y + side * 0.55), "Director & Mentor", font=role_font,
+              fill=brand.GREY)
+
+
 def mentor_variant(key: str, photos: list[Path]) -> tuple[Path, str, float]:
     """Pick the photograph, the side it sits on, and how tight the crop is.
 
@@ -1015,22 +1082,32 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
         raise RenderError(f"Entry {entry.get('id')} has no headline")
     accent = (entry.get("accent") or "").strip()
 
-    mentors = list_mentor_photos()
-    if not mentors:
+    # The hero image is the day's photograph, chosen for the line it carries.
+    # The mentor is no longer the whole right-hand panel - she is a small
+    # badge, which is what keeps the Academy identifiable without making
+    # every post a portrait of the same person on the same day at the same
+    # desk.
+    # This layout has its own pool. It fades the left 46% of the frame into
+    # the ground, so a photograph whose subject sits centre or left comes
+    # back with a face sliced in half - which is what the general pool, shot
+    # for the other layouts, mostly gives. assets/hero/ holds frames composed
+    # subject-right with dark empty space on the left.
+    hero = assets.pick_hero(entry.get("theme"),
+                            seed=sum(ord(c) for c in str(entry.get("id", ""))))
+    if hero is None:
         raise RenderError(
-            f"No mentor photographs in {brand.ASSETS / MENTOR_DIR}. This "
-            f"layout is built around one - add at least one and prefer "
-            f"several, so consecutive days are not identical.")
-
-    # Rotate through the mentor photographs by date, so a run for the same
-    # day always rebuilds the same creative but consecutive days differ.
-    photo, side, zoom = mentor_variant(entry.get("id", ""), mentors)
+            f"No photographs in {brand.ASSETS / assets.HERO_DIR}. This layout "
+            f"needs frames composed subject-right; the general background "
+            f"pool is not, and its subjects get cut by the fade.")
+    photo, zoom = hero, 1.0
+    side = "right"
 
     width, height = size
     margin = int(width * MARGIN_X)
     footer_top = height - int(height * FOOTER_HEIGHT)
 
     image = _mentor_panel(photo, size, footer_top, side=side, zoom=zoom)
+    _mentor_badge(image, footer_top)
     draw = ImageDraw.Draw(image)
 
     # When the mentor sits on the left, the type moves to the right half.
@@ -1082,7 +1159,7 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
 
     y = _angled_offer(image, margin, y + int(height * 0.014))
 
-    image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
+    image = draw_footer(image, subline=brand.BRAND_TAGLINE)
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1090,8 +1167,9 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
 
     return {
         "image_path": str(out_path),
-        "background": background.name,
-        "mentor_photo": photo.name,
+        "background": photo.name,
+        "offered_background": Path(background).name,
+        "mentor_badge": _badge_photo_name(),
         "mentor_side": side,
         "mentor_zoom": zoom,
         "canvas": canvas,
