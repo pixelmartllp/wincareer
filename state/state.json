@@ -226,6 +226,18 @@
       "permalink": "https://www.instagram.com/p/DcvFJZkGEHH/",
       "image": "02-w004.jpg",
       "note": "second post of the day, requested by the owner"
+    },
+    {
+      "date": "2026-09-02",
+      "time": "02:47 IST",
+      "timestamp": "2026-09-01T21:17:12.048483+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w055",
+      "post_id": "122122145787314742",
+      "scheduled_for": "2026-09-02 09:00 IST",
+      "image": "01-w055.jpg"
     }
   ],
   "rotation": {
@@ -239,7 +251,8 @@
       "w030",
       "w029",
       "w013",
-      "w004"
+      "w004",
+      "w055"
     ],
     "recent_backgrounds": [
       "neutral-02.jpg",
@@ -289,6 +302,12 @@
       {
         "content_id": "w013",
         "background": "public_speaking-04.jpg"
+      }
+    ],
+    "2026-09-02": [
+      {
+        "content_id": "w055",
+        "background": "interview-01.jpg"
       }
     ]
   }
