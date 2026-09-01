@@ -990,17 +990,17 @@ def fit_hook(draw: ImageDraw.ImageDraw, text: str, max_width: int,
             int(HOOK_SIZES[-1] * LINE_SPACING))
 
 
-def _angled_offer(image: Image.Image, x: int, y: int) -> int:
-    """The offer as a tilted block. Returns its bottom edge.
+def _offer_block(image: Image.Image, x: int, y: int) -> int:
+    """The offer, straight, with a shadow and an arrow. Returns its bottom.
 
-    Borrowed from the NS Study reference the owner sent, where the offer is a
-    rotated slab and is the loudest thing on the canvas. The tilt is what does
-    the work: everything else on the creative sits on a horizontal, so a few
-    degrees off makes the block read as applied rather than laid out.
+    This is the one thing on the creative anyone is being asked to act on, so
+    it is built to be read as a button rather than as a label: a drop shadow
+    lifts it off the ground, and the arrow says it is something to press.
 
-    Kept to a small angle. Past about eight degrees the type starts to look
-    like a sticker rather than a designed element, and the bounding box eats
-    into the headline above it.
+    It was tilted for a while, copied from a reference where the offer is a
+    rotated slab. On that ad the slab is a one-off launch price and the tilt
+    is the whole gesture; here it is the same block every day, and the owner's
+    verdict was that it just looked crooked. Straight.
     """
     width, height = image.size
 
@@ -1010,65 +1010,50 @@ def _angled_offer(image: Image.Image, x: int, y: int) -> int:
     sub = "Book your seat today"
 
     probe = ImageDraw.Draw(image)
-    text_width = tracked_width(probe, brand.OFFER, font, tracking)
-    inner = max(text_width, probe.textlength(sub, font=sub_font))
+    text_w = tracked_width(probe, brand.OFFER, font, tracking)
+    sub_w = probe.textlength(sub, font=sub_font)
 
-    pad_x, pad_y = int(width * 0.034), int(height * 0.016)
-    badge_w = int(inner) + pad_x * 2
-    badge_h = (int(height * BADGE_TEXT * 1.15)
-               + int(height * BADGE_SUB_TEXT * 1.9) + pad_y * 2)
+    pad_x, pad_y = int(width * 0.036), int(height * 0.018)
+    arrow_d = int(height * 0.042)
+    gap = int(width * 0.030)
 
-    # Drawn upright on its own transparent layer, then rotated - rotating the
-    # finished text keeps the letterforms clean, where drawing on an angle
-    # would have to fake it per glyph.
-    badge = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
-    bd = ImageDraw.Draw(badge)
-    bd.rounded_rectangle([(0, 0), (badge_w - 1, badge_h - 1)],
-                         radius=int(height * 0.010), fill=(*brand.ORANGE, 255))
-    draw_tracked(bd, (pad_x, pad_y), brand.OFFER, font, brand.WHITE, tracking)
-    bd.text((pad_x + 2, pad_y + int(height * BADGE_TEXT * 1.25)), sub,
-            font=sub_font, fill=(255, 226, 208))
+    block_w = int(max(text_w, sub_w)) + pad_x * 2 + arrow_d + gap
+    block_h = (int(height * BADGE_TEXT * 1.15)
+               + int(height * BADGE_SUB_TEXT * 1.95) + pad_y * 2)
+    radius = int(height * 0.014)
 
-    badge = badge.rotate(OFFER_TILT, resample=Image.BICUBIC, expand=True)
-    image.paste(badge, (x - int(width * 0.012), y), badge)
-    return y + badge.height
+    # Shadow first, on its own blurred layer. Drawn straight onto the canvas
+    # it would band against the near-black instead of falling off.
+    shadow = Image.new("RGBA", (block_w + 60, block_h + 60), (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).rounded_rectangle(
+        [(30, 30), (block_w + 29, block_h + 29)], radius=radius,
+        fill=(0, 0, 0, 150))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(14))
+    image.paste(shadow, (x - 30, y - 30 + int(height * 0.007)), shadow)
 
-
-def _demo_badge(image: Image.Image, x: int, y: int) -> int:
-    """The free-demo offer block. Returns its bottom edge.
-
-    Sized to be seen, not merely present. The first version set this in a
-    small pill and the owner's verdict on the result was that the creative
-    said nothing about free demo classes at all - which was fair: at that
-    size it read as a caption. On both reference ads the offer is the loudest
-    object after the headline, so it is set in the display face and given a
-    line of supporting text underneath.
-    """
     draw = ImageDraw.Draw(image)
-    width, height = image.size
+    draw.rounded_rectangle([(x, y), (x + block_w, y + block_h)],
+                           radius=radius, fill=brand.ORANGE)
 
-    font = brand.load_font("display", int(height * BADGE_TEXT))
-    tracking = height * 0.0010
-    text = brand.OFFER
-    text_width = tracked_width(draw, text, font, tracking)
-
-    sub_font = brand.load_font("body_medium", int(height * BADGE_SUB_TEXT))
-    sub = "Book your seat today"
-    sub_width = draw.textlength(sub, font=sub_font)
-
-    pad_x, pad_y = int(width * 0.034), int(height * 0.016)
-    inner = max(text_width, sub_width)
-    badge_w = int(inner) + pad_x * 2
-    badge_h = (int(height * BADGE_TEXT * 1.15) + int(height * BADGE_SUB_TEXT * 1.9)
-               + pad_y * 2)
-
-    draw.rounded_rectangle([(x, y), (x + badge_w, y + badge_h)],
-                           radius=int(height * 0.016), fill=brand.ORANGE)
-    draw_tracked(draw, (x + pad_x, y + pad_y), text, font, brand.WHITE,
+    draw_tracked(draw, (x + pad_x, y + pad_y), brand.OFFER, font, brand.WHITE,
                  tracking)
-    draw.text((x + pad_x + 2, y + pad_y + int(height * BADGE_TEXT * 1.25)),
-              sub, font=sub_font, fill=(255, 226, 208))
-    return y + badge_h
+    draw.text((x + pad_x + 2, y + pad_y + int(height * BADGE_TEXT * 1.28)),
+              sub, font=sub_font, fill=(255, 228, 212))
+
+    # A white disc with an orange arrow: the thing that makes it read as a
+    # button rather than a coloured rectangle with words in it.
+    cx = x + block_w - pad_x - arrow_d // 2
+    cy = y + block_h // 2
+    r = arrow_d // 2
+    draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], fill=brand.WHITE)
+
+    shaft = int(r * 0.52)
+    head = int(r * 0.34)
+    draw.line([(cx - shaft, cy), (cx + shaft * 0.35, cy)],
+              fill=brand.ORANGE, width=max(3, r // 6))
+    draw.polygon([(cx + shaft, cy), (cx + shaft - head, cy - head),
+                  (cx + shaft - head, cy + head)], fill=brand.ORANGE)
+    return y + block_h
 
 
 def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
@@ -1157,7 +1142,7 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
             y += accent_line_h
         y += int(height * 0.012)
 
-    y = _angled_offer(image, margin, y + int(height * 0.014))
+    y = _offer_block(image, margin, y + int(height * 0.014))
 
     image = draw_footer(image, subline=brand.BRAND_TAGLINE)
 
@@ -1377,7 +1362,7 @@ def _layout_card(entry: dict, background: Path, out_path: Path,
     else:
         accent_font, accent_lines = None, []
 
-    y = _angled_offer(image, margin, y + int(height * 0.016))
+    y = _offer_block(image, margin, y + int(height * 0.016))
 
     _feature_row(image, footer_top - int(height * 0.072), dark=dark)
     image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
