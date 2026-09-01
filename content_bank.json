@@ -1,85 +1,521 @@
 {
   "_note": "Win Career Academy post ideas. headline is set in Anton caps on the creative, so keep it to 3-6 words. accent is the smaller line under it. caption is the post body - the CTA, phone, mentor and hashtags are appended by the pipeline, do not repeat them here.",
-  "_themes": ["spoken_english", "confidence", "public_speaking", "interview", "career_growth", "communication", "personality", "leadership", "mindset", "practice"],
+  "_themes": [
+    "spoken_english",
+    "confidence",
+    "public_speaking",
+    "interview",
+    "career_growth",
+    "communication",
+    "personality",
+    "leadership",
+    "mindset",
+    "practice"
+  ],
   "entries": [
-    {"id": "w001", "theme": "confidence", "headline": "YOUR VOICE IS YOUR EDGE", "accent": "Most people never learn to use it.", "caption": "Two people with the same degree walk into the same room. One gets remembered. The difference is rarely knowledge - it is how they speak. Your voice is a skill, and skills can be trained."},
-    {"id": "w002", "theme": "spoken_english", "headline": "FLUENCY IS NOT VOCABULARY", "accent": "It is confidence under pressure.", "caption": "You already know more English words than you use. What stops you is the pause before speaking - the fear of getting it wrong. Fluency comes from practice with feedback, not from a bigger word list."},
-    {"id": "w003", "theme": "public_speaking", "headline": "THE ROOM IS NOT JUDGING YOU", "accent": "It is waiting for you to begin.", "caption": "Almost everyone feels their heart race before speaking. Trained speakers feel it too. The difference is they have practised enough that their body knows what comes next."},
-    {"id": "w004", "theme": "interview", "headline": "THEY HIRE THE CLEAREST", "accent": "Not always the most qualified.", "caption": "In a 30-minute interview, the panel cannot measure everything you know. They measure how clearly you explain what you know. Clarity is trainable, and it is what gets the offer."},
-    {"id": "w005", "theme": "career_growth", "headline": "ONE SKILL CHANGES THE CEILING", "accent": "Communication is that skill.", "caption": "Technical ability gets you the job. Communication decides how far you go inside it. The people who get promoted are the ones who can explain, persuade and lead a room."},
-    {"id": "w006", "theme": "communication", "headline": "SPEAK SO THEY REMEMBER", "accent": "Not so they are impressed.", "caption": "Big words impress for a moment. Clear words get acted on. The best communicators in any company are the easiest to understand, not the hardest."},
-    {"id": "w007", "theme": "personality", "headline": "PRESENCE IS A HABIT", "accent": "Not something you are born with.", "caption": "Standing straight. Looking up. Finishing your sentence instead of trailing off. Presence is a set of small habits, and every one of them can be practised."},
-    {"id": "w008", "theme": "leadership", "headline": "LEADERS ARE HEARD", "accent": "Then they are followed.", "caption": "No one follows an idea they did not understand. Before you can lead a team, you have to be able to say what you want in a way that lands the first time."},
-    {"id": "w009", "theme": "mindset", "headline": "START BEFORE YOU FEEL READY", "accent": "Ready comes after, never before.", "caption": "Waiting to feel confident before you speak is backwards. Confidence is what you get after speaking badly a few times and surviving it. Start there."},
-    {"id": "w010", "theme": "practice", "headline": "TWENTY MINUTES A DAY", "accent": "Beats one long class a week.", "caption": "Language lives in your mouth, not your notebook. Twenty minutes of speaking every day will move you further in a month than four hours of notes on a Sunday."},
-
-    {"id": "w011", "theme": "spoken_english", "headline": "STOP TRANSLATING IN YOUR HEAD", "accent": "That pause is what people hear.", "caption": "If you build the sentence in your own language first and then convert it, you will always be one beat behind. Training your ear to think directly in English removes that pause."},
-    {"id": "w012", "theme": "confidence", "headline": "NERVOUS IS NOT UNPREPARED", "accent": "Learn to tell them apart.", "caption": "Nerves show up even when you know your material perfectly. Treating that feeling as proof you are not ready is the mistake. It is just your body getting ready."},
-    {"id": "w013", "theme": "public_speaking", "headline": "THE FIRST LINE CARRIES YOU", "accent": "Rehearse that one until it is easy.", "caption": "You do not need to memorise a whole speech. Memorise the opening. Once the first sentence is out cleanly, the rest almost always follows."},
-    {"id": "w014", "theme": "interview", "headline": "ANSWER THE QUESTION ASKED", "accent": "Then stop talking.", "caption": "The most common interview mistake is not a wrong answer - it is a long one. Say the answer, give one example, and let the silence sit. It reads as confidence."},
-    {"id": "w015", "theme": "career_growth", "headline": "INVISIBLE WORK STAYS INVISIBLE", "accent": "Learn to talk about yours.", "caption": "Doing good work is half the job. Being able to describe it without shrinking or boasting is the other half. Most careers stall on the second half."},
-    {"id": "w016", "theme": "communication", "headline": "LISTENING IS HALF OF IT", "accent": "The half most people skip.", "caption": "Strong communicators are not the ones waiting to talk. They are the ones who heard the actual question and answered that one. It is the cheapest way to stand out."},
-    {"id": "w017", "theme": "personality", "headline": "YOUR BODY SPEAKS FIRST", "accent": "It arrives before your words.", "caption": "Before you say anything, the room has read your posture, your eyes and your hands. That reading takes seconds and it colours everything you say afterwards."},
-    {"id": "w018", "theme": "leadership", "headline": "CLARITY IS KINDNESS", "accent": "Vague instructions waste people.", "caption": "When a leader is unclear, the team guesses. Guessing costs time and morale. Saying exactly what you need is not harsh - it is the most respectful thing you can do."},
-    {"id": "w019", "theme": "mindset", "headline": "YOU ARE NOT BAD AT ENGLISH", "accent": "You are out of practice.", "caption": "There is a difference between lacking ability and lacking reps. Almost everyone who says they are bad at English is simply someone who has not spoken it out loud this year."},
-    {"id": "w020", "theme": "practice", "headline": "SPEAK IT OUT LOUD", "accent": "Reading silently teaches nothing.", "caption": "Your mouth needs to learn the shapes, and your ear needs to hear you make them. Silent reading builds recognition. Only speaking builds fluency."},
-
-    {"id": "w021", "theme": "confidence", "headline": "SMALL ROOMS FIRST", "accent": "Then bigger ones.", "caption": "Nobody starts on a stage. Start with one colleague, then a team meeting, then a presentation. Confidence built in order holds. Confidence forced out of order breaks."},
-    {"id": "w022", "theme": "spoken_english", "headline": "MISTAKES ARE THE METHOD", "accent": "Not a sign to stop.", "caption": "Every fluent speaker got there through a long run of wrong sentences that nobody remembers. The mistakes are not the cost of learning - they are the learning."},
-    {"id": "w023", "theme": "public_speaking", "headline": "SLOW DOWN TO SOUND SURE", "accent": "Speed reads as panic.", "caption": "When we are nervous we speed up, and speed makes us sound unsure. Deliberately slowing to just below comfortable is the fastest way to sound in control."},
-    {"id": "w024", "theme": "interview", "headline": "PREPARE YOUR STORIES", "accent": "Not your adjectives.", "caption": "Saying you are hardworking proves nothing. One specific story about a deadline you saved proves it completely. Prepare five stories, not a list of qualities."},
-    {"id": "w025", "theme": "career_growth", "headline": "THE MEETING IS THE JOB", "accent": "For most senior roles.", "caption": "The further you go, the more of your work happens in rooms with other people. If meetings drain you and you go quiet in them, that ceiling arrives early."},
-    {"id": "w026", "theme": "communication", "headline": "ONE IDEA PER SENTENCE", "accent": "The rest is decoration.", "caption": "Long sentences hide the point. Break them. One idea, full stop, next idea. It sounds simple because it is - and it is why some people are always understood."},
-    {"id": "w027", "theme": "personality", "headline": "EYE CONTACT IS TRAINABLE", "accent": "Three seconds at a time.", "caption": "You do not have to stare. Hold one person for about three seconds, then move. It feels mechanical for a week and natural after that."},
-    {"id": "w028", "theme": "leadership", "headline": "ASK BEFORE YOU TELL", "accent": "You will be told the truth.", "caption": "A leader who opens with instructions hears agreement. A leader who opens with a question hears what is actually happening. Only one of those is useful."},
-    {"id": "w029", "theme": "mindset", "headline": "COMPARE TO LAST MONTH", "accent": "Not to the fluent person.", "caption": "Measuring yourself against someone ten years ahead only produces discouragement. Measure against the version of you from four weeks ago. That gap is real and it is yours."},
-    {"id": "w030", "theme": "practice", "headline": "RECORD YOURSELF ONCE", "accent": "You will hear it immediately.", "caption": "Two minutes on your phone will teach you more about your filler words and your pace than a month of advice. It is uncomfortable exactly once."},
-
-    {"id": "w031", "theme": "confidence", "headline": "PERMISSION IS NOT COMING", "accent": "Speak anyway.", "caption": "Most people wait to be invited into the conversation. The invitation rarely arrives. The ones who grow are the ones who started contributing before anyone asked."},
-    {"id": "w032", "theme": "spoken_english", "headline": "ACCENT IS NOT THE PROBLEM", "accent": "Clarity is the goal.", "caption": "Nobody good is trying to erase where they are from. The target is being understood the first time, every time. That is a completely different skill from sounding foreign."},
-    {"id": "w033", "theme": "public_speaking", "headline": "PAUSES ARE NOT GAPS", "accent": "They are punctuation.", "caption": "Silence feels endless to the speaker and natural to the listener. A pause before your main point makes the room lean in. Filling it with um does the opposite."},
-    {"id": "w034", "theme": "interview", "headline": "RESEARCH BEATS REHEARSAL", "accent": "Know who you are talking to.", "caption": "Ten minutes reading about the company changes every answer you give. It turns generic responses into specific ones, and specific is what gets remembered."},
-    {"id": "w035", "theme": "career_growth", "headline": "SKILLS COMPOUND QUIETLY", "accent": "Then all at once.", "caption": "For weeks it feels like nothing is changing. Then one meeting goes differently and you notice. Communication training pays out in steps, not in a smooth line."},
-    {"id": "w036", "theme": "communication", "headline": "SAY THE POINT FIRST", "accent": "Then explain it.", "caption": "Most people build up to their conclusion and lose the room on the way. Lead with what you want, then give the reasoning. Busy people will thank you."},
-    {"id": "w037", "theme": "personality", "headline": "DRESS FOR THE ROOM", "accent": "Then forget about it.", "caption": "Getting it right removes a distraction - yours. Once you are not thinking about how you look, all of your attention is free for what you are saying."},
-    {"id": "w038", "theme": "leadership", "headline": "CREDIT OUT, BLAME IN", "accent": "That is the whole formula.", "caption": "Push praise towards your team in public and absorb the problems yourself. It costs nothing and it is the fastest way people decide they will follow you."},
-    {"id": "w039", "theme": "mindset", "headline": "SHY IS NOT A LIFE SENTENCE", "accent": "It is a starting point.", "caption": "Quiet people become excellent speakers all the time. They tend to listen better and waste fewer words. What they needed was practice, not a personality transplant."},
-    {"id": "w040", "theme": "practice", "headline": "ONE CONVERSATION A DAY", "accent": "In English, with a real person.", "caption": "Apps build vocabulary. Only people build fluency, because only people interrupt, misunderstand and reply at real speed. Find one, every day."},
-
-    {"id": "w041", "theme": "confidence", "headline": "PREPARED BEATS TALENTED", "accent": "Almost every single time.", "caption": "The person who seems naturally confident usually rehearsed. What looks like talent from the outside is very often just someone who did the work beforehand."},
-    {"id": "w042", "theme": "spoken_english", "headline": "SIMPLE IS NOT WEAK", "accent": "It is what fluent sounds like.", "caption": "Learners reach for complicated words to prove themselves. Fluent speakers use short ones because they are chasing clarity, not approval."},
-    {"id": "w043", "theme": "public_speaking", "headline": "KNOW YOUR FIRST 30 SECONDS", "accent": "The audience decides there.", "caption": "People form their opinion of a speaker almost immediately. Put your preparation where it earns the most - the opening - rather than spreading it thin."},
-    {"id": "w044", "theme": "interview", "headline": "QUESTIONS SHOW SERIOUSNESS", "accent": "Bring three, always.", "caption": "When they ask if you have questions, having none reads as indifference. Two good questions about the actual work will outlast everything else you said."},
-    {"id": "w045", "theme": "career_growth", "headline": "BE EASY TO WORK WITH", "accent": "It travels further than skill.", "caption": "People recommend the colleague who communicates clearly and does not create friction. That reputation opens more doors than any certificate on your wall."},
-    {"id": "w046", "theme": "communication", "headline": "CHECK YOU WERE UNDERSTOOD", "accent": "Do not assume it.", "caption": "A short question at the end - does that make sense, or should I go over it again - catches the misunderstanding while it is still cheap to fix."},
-    {"id": "w047", "theme": "personality", "headline": "SMILE BEFORE YOU SPEAK", "accent": "It changes your own voice.", "caption": "A smile is not only for the listener. It physically loosens your throat and lifts your tone. You will sound warmer because you actually are."},
-    {"id": "w048", "theme": "leadership", "headline": "REPEAT THE IMPORTANT THING", "accent": "Once is never enough.", "caption": "You are tired of saying it long before your team has heard it. The message you think is over-communicated is usually just barely landing."},
-    {"id": "w049", "theme": "mindset", "headline": "PROGRESS IS NOT LINEAR", "accent": "Plateaus are part of it.", "caption": "There will be a stretch where nothing seems to improve. That is normal and it is usually right before a jump. Quitting during it is the only real failure."},
-    {"id": "w050", "theme": "practice", "headline": "PRACTISE THE HARD PART", "accent": "Not the part you enjoy.", "caption": "It is comfortable to rehearse what already works. Growth is in the section you keep skipping - the introduction you fumble, the question you dread."},
-
-    {"id": "w051", "theme": "confidence", "headline": "OWN THE PAUSE", "accent": "Do not apologise for thinking.", "caption": "Saying let me think about that for a second is a strong sentence. Filling the gap with sorry and um is what makes you sound unsure."},
-    {"id": "w052", "theme": "spoken_english", "headline": "READ ALOUD FOR TEN MINUTES", "accent": "Any book will do.", "caption": "Reading aloud trains rhythm, breath and pronunciation at the same time, and it needs no partner. It is the highest-return practice you can do alone."},
-    {"id": "w053", "theme": "public_speaking", "headline": "TALK TO ONE PERSON", "accent": "Even in a full room.", "caption": "A crowd is overwhelming. One face is not. Speak to one person for a sentence, then another. The room feels like a conversation instead of a performance."},
-    {"id": "w054", "theme": "interview", "headline": "PRACTISE OUT LOUD FIRST", "accent": "Thinking it through is not enough.", "caption": "An answer that felt clear in your head often falls apart in your mouth. Say your answers out loud before the day, and find the tangles while they cost nothing."},
-    {"id": "w055", "theme": "career_growth", "headline": "SPEAK UP IN MEETINGS", "accent": "Once is enough to start.", "caption": "One useful sentence per meeting changes how people see you within a month. It does not have to be brilliant. It has to be heard."},
-    {"id": "w056", "theme": "communication", "headline": "TONE CARRIES THE MEANING", "accent": "The words are only half.", "caption": "The same sentence can land as help or as criticism depending entirely on how it is said. When something goes wrong between people, tone is usually the reason."},
-    {"id": "w057", "theme": "personality", "headline": "BE ON TIME, BE PREPARED", "accent": "The basics build the reputation.", "caption": "Long before anyone judges your ideas they have judged whether you are reliable. Turning up ready is unglamorous and it quietly decides a lot."},
-    {"id": "w058", "theme": "leadership", "headline": "SAY WHAT YOU WILL DO", "accent": "Then do exactly that.", "caption": "Trust is built by small promises kept in public. A leader whose words predict their actions does not need authority to be followed."},
-    {"id": "w059", "theme": "mindset", "headline": "AGE IS NOT THE OBSTACLE", "accent": "Starting late still works.", "caption": "People learn to speak well at 22 and at 52. What changes is not the ability - it is how willing you are to be a beginner in front of others."},
-    {"id": "w060", "theme": "practice", "headline": "TWO STUDENTS, FULL ATTENTION", "accent": "That is how skill actually moves.", "caption": "In a room of forty you speak for one minute an hour. Real correction needs someone hearing every sentence you say and telling you what to fix."},
-
-    {"id": "w061", "theme": "spoken_english", "headline": "GRAMMAR FOLLOWS SPEAKING", "accent": "Not the other way round.", "caption": "Children speak fluently years before they learn a rule. Adults reverse it and get stuck. Speak first, let the corrections come, and the grammar settles in behind."},
-    {"id": "w062", "theme": "confidence", "headline": "SOMEBODY NEEDS YOUR POINT", "accent": "Silence helps nobody.", "caption": "The thought you are holding back because it seems obvious is often the one the room needed said. Assuming everyone already knows is usually wrong."},
-    {"id": "w063", "theme": "public_speaking", "headline": "END WHERE YOU PLANNED", "accent": "Do not trail into nothing.", "caption": "Most talks do not finish, they fade. Know your last sentence, say it, and stop. A clean ending is remembered as confidence."},
-    {"id": "w064", "theme": "interview", "headline": "FIRST IMPRESSION IS A GREETING", "accent": "Practise that too.", "caption": "A clear hello, your name, eye contact, a steady handshake. It takes four seconds and it sets the temperature for the next half hour."},
-    {"id": "w065", "theme": "career_growth", "headline": "ENGLISH OPENS THE SHORTLIST", "accent": "Skill decides the rest.", "caption": "It is not fair, but it is true - communication is often the first filter. Getting past it is what lets your actual ability be seen at all."},
-    {"id": "w066", "theme": "communication", "headline": "WRITE IT SHORTER", "accent": "Then send it.", "caption": "The email nobody replies to is usually the long one. Cut it in half and the answer comes back the same day. The same rule works out loud."},
-    {"id": "w067", "theme": "personality", "headline": "STAND LIKE YOU BELONG", "accent": "Your body will convince you.", "caption": "Posture is not only for other people to read. Standing tall changes your breathing and your voice, and the confidence follows the position."},
-    {"id": "w068", "theme": "leadership", "headline": "LET SILENCE DO THE WORK", "accent": "Someone will fill it.", "caption": "When you ask a question and get nothing, wait. Five uncomfortable seconds pulls out the thought that a quick rescue would have buried."},
-    {"id": "w069", "theme": "mindset", "headline": "NOBODY REMEMBERS YOUR STUMBLE", "accent": "You are the only one replaying it.", "caption": "The moment you have been cringing about for three days left everyone else's mind in about nine seconds. That mismatch is worth remembering."},
-    {"id": "w070", "theme": "practice", "headline": "SHOW UP ON THE BAD DAYS", "accent": "That is where the gain is.", "caption": "Practice on the day you feel sharp is easy and does little. The session you did not want to attend is the one that moves the needle."},
-
-    {"id": "w071", "theme": "communication", "headline": "NAMES MATTER", "accent": "Use them, get them right.", "caption": "Using someone's name correctly is the smallest possible effort with the largest possible return. Getting it wrong twice undoes a lot of good work."},
-    {"id": "w072", "theme": "career_growth", "headline": "THE OFFER GOES TO THE CLEAR", "accent": "Every round, at every level.", "caption": "From the first interview to the boardroom, the pattern holds. The person who can be understood quickly, under pressure, is the one who moves forward."}
+    {
+      "id": "w001",
+      "theme": "confidence",
+      "headline": "YOUR VOICE IS YOUR EDGE",
+      "accent": "Most people never learn to use it.",
+      "caption": "Two people with the same degree walk into the same room. One gets remembered. The difference is rarely knowledge - it is how they speak. Your voice is a skill, and skills can be trained."
+    },
+    {
+      "id": "w002",
+      "theme": "spoken_english",
+      "headline": "FLUENCY IS NOT VOCABULARY",
+      "accent": "It is confidence under pressure.",
+      "caption": "You already know more English words than you use. What stops you is the pause before speaking - the fear of getting it wrong. Fluency comes from practice with feedback, not from a bigger word list."
+    },
+    {
+      "id": "w003",
+      "theme": "public_speaking",
+      "headline": "THE ROOM IS NOT JUDGING YOU",
+      "accent": "It is waiting for you to begin.",
+      "caption": "Almost everyone feels their heart race before speaking. Trained speakers feel it too. The difference is they have practised enough that their body knows what comes next."
+    },
+    {
+      "id": "w004",
+      "theme": "interview",
+      "headline": "THEY HIRE THE ONE WHO EXPLAINS",
+      "accent": "Not the one who knows more.",
+      "caption": "Two candidates, the same skills. One explains the project in clear English, the other knows it just as well and cannot get it out. The offer goes to the first. That gap is not intelligence - it is practice."
+    },
+    {
+      "id": "w005",
+      "theme": "career_growth",
+      "headline": "YOUR ENGLISH IS YOUR CEILING",
+      "accent": "Not your technical skill.",
+      "caption": "You know the work. But the meetings, the client calls and the presentations all happen in English, and that is where the promotions are decided. Fix the language and the ceiling moves."
+    },
+    {
+      "id": "w006",
+      "theme": "communication",
+      "headline": "SPEAK SO THEY REMEMBER",
+      "accent": "Not so they are impressed.",
+      "caption": "Big words impress for a moment. Clear words get acted on. The best communicators in any company are the easiest to understand, not the hardest."
+    },
+    {
+      "id": "w007",
+      "theme": "personality",
+      "headline": "PRESENCE IS A HABIT",
+      "accent": "Not something you are born with.",
+      "caption": "Standing straight. Looking up. Finishing your sentence instead of trailing off. Presence is a set of small habits, and every one of them can be practised."
+    },
+    {
+      "id": "w008",
+      "theme": "leadership",
+      "headline": "YOU LEAD IN ENGLISH OR NOT AT ALL",
+      "accent": "That is the job now.",
+      "caption": "Team lead means running the call, pushing back on a client, explaining a delay. All of it in English. Plenty of good engineers turn the role down for exactly this reason."
+    },
+    {
+      "id": "w009",
+      "theme": "mindset",
+      "headline": "START BEFORE YOU FEEL READY",
+      "accent": "Ready comes after, never before.",
+      "caption": "Waiting to feel confident before you speak is backwards. Confidence is what you get after speaking badly a few times and surviving it. Start there."
+    },
+    {
+      "id": "w010",
+      "theme": "practice",
+      "headline": "TWENTY MINUTES A DAY",
+      "accent": "Beats one long class a week.",
+      "caption": "Language lives in your mouth, not your notebook. Twenty minutes of speaking every day will move you further in a month than four hours of notes on a Sunday."
+    },
+    {
+      "id": "w011",
+      "theme": "spoken_english",
+      "headline": "STOP TRANSLATING IN YOUR HEAD",
+      "accent": "That pause is what people hear.",
+      "caption": "If you build the sentence in your own language first and then convert it, you will always be one beat behind. Training your ear to think directly in English removes that pause."
+    },
+    {
+      "id": "w012",
+      "theme": "confidence",
+      "headline": "YOU FREEZE, YOU DO NOT FORGET",
+      "accent": "The words are in there.",
+      "caption": "You knew the answer. In the meeting your mind went blank and someone else said it. That is not a vocabulary problem - it is what happens when you have never practised speaking under pressure."
+    },
+    {
+      "id": "w013",
+      "theme": "public_speaking",
+      "headline": "THE FIRST LINE CARRIES YOU",
+      "accent": "Rehearse that one until it is easy.",
+      "caption": "You do not need to memorise a whole speech. Memorise the opening. Once the first sentence is out cleanly, the rest almost always follows."
+    },
+    {
+      "id": "w014",
+      "theme": "interview",
+      "headline": "REJECTED ON COMMUNICATION",
+      "accent": "Again.",
+      "caption": "The technical round went well. The feedback said communication. It is the most common rejection reason working professionals get, and the most fixable one."
+    },
+    {
+      "id": "w015",
+      "theme": "career_growth",
+      "headline": "YOUR WORK IS INVISIBLE IN ENGLISH",
+      "accent": "Learn to describe it.",
+      "caption": "You did the work. In the review you could not explain it clearly, so it went unnoticed. Being able to say what you did, in plain English, is half of getting credit for it."
+    },
+    {
+      "id": "w016",
+      "theme": "communication",
+      "headline": "YOU NOD, YOU DO NOT FOLLOW",
+      "accent": "Everyone has done it.",
+      "caption": "The client spoke fast, you nodded, and you left the call unsure what was agreed. Asking someone to repeat themselves in English feels harder than guessing. It is not."
+    },
+    {
+      "id": "w017",
+      "theme": "personality",
+      "headline": "YOUR BODY SPEAKS FIRST",
+      "accent": "It arrives before your words.",
+      "caption": "Before you say anything, the room has read your posture, your eyes and your hands. That reading takes seconds and it colours everything you say afterwards."
+    },
+    {
+      "id": "w018",
+      "theme": "leadership",
+      "headline": "SILENT ON THE CLIENT CALL",
+      "accent": "Even when you had the answer.",
+      "caption": "Camera on, mouth shut, forty minutes. Not because you had nothing to say - because building the sentence took longer than the moment lasted."
+    },
+    {
+      "id": "w019",
+      "theme": "mindset",
+      "headline": "YOU ARE NOT BAD AT ENGLISH",
+      "accent": "You are out of practice.",
+      "caption": "There is a difference between lacking ability and lacking reps. Almost everyone who says they are bad at English is simply someone who has not spoken it out loud this year."
+    },
+    {
+      "id": "w020",
+      "theme": "practice",
+      "headline": "SPEAK IT OUT LOUD",
+      "accent": "Reading silently teaches nothing.",
+      "caption": "Your mouth needs to learn the shapes, and your ear needs to hear you make them. Silent reading builds recognition. Only speaking builds fluency."
+    },
+    {
+      "id": "w021",
+      "theme": "confidence",
+      "headline": "START WITH ONE SENTENCE",
+      "accent": "In the next meeting.",
+      "caption": "You do not have to run the call. Say one clear sentence in English in the next meeting, then one in the one after. Confidence is built in that order, not all at once."
+    },
+    {
+      "id": "w022",
+      "theme": "spoken_english",
+      "headline": "MISTAKES ARE THE METHOD",
+      "accent": "Not a sign to stop.",
+      "caption": "Every fluent speaker got there through a long run of wrong sentences that nobody remembers. The mistakes are not the cost of learning - they are the learning."
+    },
+    {
+      "id": "w023",
+      "theme": "public_speaking",
+      "headline": "YOU SPEAK FAST TO ESCAPE",
+      "accent": "Slow down and it lands.",
+      "caption": "When English feels risky we rush, hoping to finish before anyone notices a mistake. Rushing is what people actually notice. Slower English sounds more fluent, not less."
+    },
+    {
+      "id": "w024",
+      "theme": "interview",
+      "headline": "PREPARE THE SENTENCE, NOT THE ANSWER",
+      "accent": "Say it out loud first.",
+      "caption": "You know what you want to say about your project. Say it out loud in English before the interview, and find out where it tangles while it still costs you nothing."
+    },
+    {
+      "id": "w025",
+      "theme": "career_growth",
+      "headline": "THE MEETING IS IN ENGLISH",
+      "accent": "So the job is too.",
+      "caption": "For most senior roles the work happens in rooms full of other people, in English. If you go quiet in those rooms, the ceiling arrives long before your skill runs out."
+    },
+    {
+      "id": "w026",
+      "theme": "communication",
+      "headline": "ONE IDEA PER SENTENCE",
+      "accent": "The rest is decoration.",
+      "caption": "Long sentences hide the point. Break them. One idea, full stop, next idea. It sounds simple because it is - and it is why some people are always understood."
+    },
+    {
+      "id": "w027",
+      "theme": "personality",
+      "headline": "YOUR ENGLISH IS FINE ON PAPER",
+      "accent": "It is the speaking.",
+      "caption": "You write clear emails. You read documentation all day. Then the call starts and none of it comes out. Written and spoken English are two different muscles."
+    },
+    {
+      "id": "w028",
+      "theme": "leadership",
+      "headline": "ASK THE QUESTION",
+      "accent": "In English, in the meeting.",
+      "caption": "Everyone else understood, you assume. Usually two other people were guessing too. The person who asks in clear English looks engaged, not slow."
+    },
+    {
+      "id": "w029",
+      "theme": "mindset",
+      "headline": "COMPARE TO LAST MONTH",
+      "accent": "Not to the fluent person.",
+      "caption": "Measuring yourself against someone ten years ahead only produces discouragement. Measure against the version of you from four weeks ago. That gap is real and it is yours."
+    },
+    {
+      "id": "w030",
+      "theme": "practice",
+      "headline": "RECORD YOURSELF ONCE",
+      "accent": "You will hear it immediately.",
+      "caption": "Two minutes on your phone will teach you more about your filler words and your pace than a month of advice. It is uncomfortable exactly once."
+    },
+    {
+      "id": "w031",
+      "theme": "confidence",
+      "headline": "PERMISSION IS NOT COMING",
+      "accent": "Speak anyway.",
+      "caption": "Most people wait to be invited into the conversation. The invitation rarely arrives. The ones who grow are the ones who started contributing before anyone asked."
+    },
+    {
+      "id": "w032",
+      "theme": "spoken_english",
+      "headline": "ACCENT IS NOT THE PROBLEM",
+      "accent": "Clarity is the goal.",
+      "caption": "Nobody good is trying to erase where they are from. The target is being understood the first time, every time. That is a completely different skill from sounding foreign."
+    },
+    {
+      "id": "w033",
+      "theme": "public_speaking",
+      "headline": "PAUSES ARE NOT GAPS",
+      "accent": "They are punctuation.",
+      "caption": "Silence feels endless to the speaker and natural to the listener. A pause before your main point makes the room lean in. Filling it with um does the opposite."
+    },
+    {
+      "id": "w034",
+      "theme": "interview",
+      "headline": "THEY ASK IN ENGLISH",
+      "accent": "Practise answering in it.",
+      "caption": "Reading about the company is not preparation if you then answer in half-formed sentences. Rehearse the answers aloud, in English, until they run without stopping."
+    },
+    {
+      "id": "w035",
+      "theme": "career_growth",
+      "headline": "SIX WEEKS CHANGES THE MEETING",
+      "accent": "Not six years.",
+      "caption": "Spoken English is not a decade-long project. Focused practice with real correction shows up in your next few meetings - which is why a short course works at all."
+    },
+    {
+      "id": "w036",
+      "theme": "communication",
+      "headline": "SAY IT IN ENGLISH FIRST",
+      "accent": "Then add the detail.",
+      "caption": "Lead with the point in one plain English sentence, then explain. Building up to it is where non-native speakers lose the room, and it is a habit, not a language gap."
+    },
+    {
+      "id": "w037",
+      "theme": "personality",
+      "headline": "SMALL TALK IS THE HARD PART",
+      "accent": "And it is learnable.",
+      "caption": "The presentation you can prepare. The two minutes before it starts, with a client, in English, is what most working professionals dread. That is trainable too."
+    },
+    {
+      "id": "w038",
+      "theme": "leadership",
+      "headline": "PRAISE YOUR TEAM IN ENGLISH",
+      "accent": "It carries further.",
+      "caption": "Saying clearly, in English, what your team did well - in the room, in front of others - is how a manager builds trust. Fumbling it is why some managers stop trying."
+    },
+    {
+      "id": "w039",
+      "theme": "mindset",
+      "headline": "SHY IS NOT A LIFE SENTENCE",
+      "accent": "It is a starting point.",
+      "caption": "Quiet people become excellent speakers all the time. They tend to listen better and waste fewer words. What they needed was practice, not a personality transplant."
+    },
+    {
+      "id": "w040",
+      "theme": "practice",
+      "headline": "ONE CONVERSATION A DAY",
+      "accent": "In English, with a real person.",
+      "caption": "Apps build vocabulary. Only people build fluency, because only people interrupt, misunderstand and reply at real speed. Find one, every day."
+    },
+    {
+      "id": "w041",
+      "theme": "confidence",
+      "headline": "PRACTISED BEATS FLUENT",
+      "accent": "Almost every time.",
+      "caption": "The colleague who sounds effortless usually rehearsed. What looks like natural English is very often someone who has said that sentence before."
+    },
+    {
+      "id": "w042",
+      "theme": "spoken_english",
+      "headline": "SIMPLE IS NOT WEAK",
+      "accent": "It is what fluent sounds like.",
+      "caption": "Learners reach for complicated words to prove themselves. Fluent speakers use short ones because they are chasing clarity, not approval."
+    },
+    {
+      "id": "w043",
+      "theme": "public_speaking",
+      "headline": "KNOW YOUR FIRST 30 SECONDS",
+      "accent": "The audience decides there.",
+      "caption": "People form their opinion of a speaker almost immediately. Put your preparation where it earns the most - the opening - rather than spreading it thin."
+    },
+    {
+      "id": "w044",
+      "theme": "interview",
+      "headline": "ASK THEM SOMETHING",
+      "accent": "In your own words.",
+      "caption": "At the end of the interview, two clear questions in English tell the panel more than a memorised answer. Prepare them the same way you prepare everything else."
+    },
+    {
+      "id": "w045",
+      "theme": "career_growth",
+      "headline": "EASY TO WORK WITH, IN ENGLISH",
+      "accent": "That is what gets you recommended.",
+      "caption": "People recommend the colleague they can explain things to quickly. When the shared language is English, being easy to talk to and being fluent enough start to look like the same thing."
+    },
+    {
+      "id": "w046",
+      "theme": "communication",
+      "headline": "CHECK THEY UNDERSTOOD YOU",
+      "accent": "One question does it.",
+      "caption": "Does that make sense, or should I go over it again. Asking costs five seconds and catches the misunderstanding while it is still cheap - especially across accents."
+    },
+    {
+      "id": "w047",
+      "theme": "personality",
+      "headline": "SMILE BEFORE YOU SPEAK",
+      "accent": "It changes your own voice.",
+      "caption": "A smile is not only for the listener. It physically loosens your throat and lifts your tone. You will sound warmer because you actually are."
+    },
+    {
+      "id": "w048",
+      "theme": "leadership",
+      "headline": "SAY IT AGAIN, SIMPLY",
+      "accent": "Once is never enough.",
+      "caption": "You explained it once, in complicated English, and moved on. Say it a second time in shorter words. The repetition is not for you, it is for the room."
+    },
+    {
+      "id": "w049",
+      "theme": "mindset",
+      "headline": "THE PLATEAU IS NOT THE END",
+      "accent": "It is right before the jump.",
+      "caption": "There is a stretch where your English feels stuck. Everyone hits it. Stopping there is the only real failure, and it is where most self-study quietly ends."
+    },
+    {
+      "id": "w050",
+      "theme": "practice",
+      "headline": "PRACTISE THE CALL YOU DREAD",
+      "accent": "Not the one you enjoy.",
+      "caption": "Rehearsing what already works is comfortable and does nothing. The client call, the status update, the introduction - practise the English you avoid."
+    },
+    {
+      "id": "w051",
+      "theme": "confidence",
+      "headline": "OWN THE PAUSE",
+      "accent": "Do not apologise for thinking.",
+      "caption": "Saying let me think about that for a second is a strong sentence. Filling the gap with sorry and um is what makes you sound unsure."
+    },
+    {
+      "id": "w052",
+      "theme": "spoken_english",
+      "headline": "TEN MINUTES, OUT LOUD",
+      "accent": "Any English text will do.",
+      "caption": "Reading aloud trains rhythm, breath and pronunciation at once and needs no partner. For a working professional with no time, it is the highest-return ten minutes there is."
+    },
+    {
+      "id": "w053",
+      "theme": "public_speaking",
+      "headline": "TALK TO ONE PERSON",
+      "accent": "Even in a full room.",
+      "caption": "A crowd is overwhelming. One face is not. Speak to one person for a sentence, then another. The room feels like a conversation instead of a performance."
+    },
+    {
+      "id": "w054",
+      "theme": "interview",
+      "headline": "REHEARSE IN ENGLISH, NOT IN YOUR HEAD",
+      "accent": "The mouth needs the reps.",
+      "caption": "An answer that felt clear in your head falls apart out loud. Say it in English before the day, and find the tangles while they cost nothing."
+    },
+    {
+      "id": "w055",
+      "theme": "career_growth",
+      "headline": "SPEAK UP IN MEETINGS",
+      "accent": "Once is enough to start.",
+      "caption": "One useful sentence per meeting changes how people see you within a month. It does not have to be brilliant. It has to be heard."
+    },
+    {
+      "id": "w056",
+      "theme": "communication",
+      "headline": "TONE CARRIES THE MEANING",
+      "accent": "The words are only half.",
+      "caption": "The same sentence can land as help or as criticism depending entirely on how it is said. When something goes wrong between people, tone is usually the reason."
+    },
+    {
+      "id": "w057",
+      "theme": "personality",
+      "headline": "TURNING UP PREPARED IN ENGLISH",
+      "accent": "Half the battle, honestly.",
+      "caption": "Knowing the three things you need to say, in English, before you walk in. Unglamorous, and it quietly decides how the room sees you."
+    },
+    {
+      "id": "w058",
+      "theme": "leadership",
+      "headline": "SAY WHAT YOU WILL DO",
+      "accent": "Then do exactly that.",
+      "caption": "Trust is built by small promises kept in public. A leader whose words predict their actions does not need authority to be followed."
+    },
+    {
+      "id": "w059",
+      "theme": "mindset",
+      "headline": "AGE IS NOT THE OBSTACLE",
+      "accent": "Starting late still works.",
+      "caption": "People learn to speak well at 22 and at 52. What changes is not the ability - it is how willing you are to be a beginner in front of others."
+    },
+    {
+      "id": "w060",
+      "theme": "practice",
+      "headline": "TWO STUDENTS, FULL ATTENTION",
+      "accent": "That is how skill actually moves.",
+      "caption": "In a room of forty you speak for one minute an hour. Real correction needs someone hearing every sentence you say and telling you what to fix."
+    },
+    {
+      "id": "w061",
+      "theme": "spoken_english",
+      "headline": "GRAMMAR FOLLOWS SPEAKING",
+      "accent": "Not the other way round.",
+      "caption": "Children speak fluently years before they learn a rule. Adults reverse it and get stuck. Speak first, let the corrections come, and the grammar settles in behind."
+    },
+    {
+      "id": "w062",
+      "theme": "confidence",
+      "headline": "YOUR POINT IS WORTH THE MISTAKE",
+      "accent": "Say it anyway.",
+      "caption": "You held back because the sentence was not perfect. Nobody in that meeting was grading your grammar - they were waiting for the point that only you had."
+    },
+    {
+      "id": "w063",
+      "theme": "public_speaking",
+      "headline": "END WHERE YOU PLANNED",
+      "accent": "Do not trail into nothing.",
+      "caption": "Most talks do not finish, they fade. Know your last sentence, say it, and stop. A clean ending is remembered as confidence."
+    },
+    {
+      "id": "w064",
+      "theme": "interview",
+      "headline": "THE FIRST HELLO",
+      "accent": "Practise that too.",
+      "caption": "A clear introduction in English, your name, what you do, four seconds. It sets the temperature for the whole interview and almost nobody rehearses it."
+    },
+    {
+      "id": "w065",
+      "theme": "career_growth",
+      "headline": "ENGLISH OPENS THE SHORTLIST",
+      "accent": "Skill decides the rest.",
+      "caption": "It is not fair, but it is true - communication is often the first filter. Getting past it is what lets your actual ability be seen at all."
+    },
+    {
+      "id": "w066",
+      "theme": "communication",
+      "headline": "SHORTER ENGLISH GETS ANSWERED",
+      "accent": "Every time.",
+      "caption": "The long email nobody replies to is usually the one written to sound impressive. Cut it in half and the reply comes the same day. The same rule works out loud."
+    },
+    {
+      "id": "w067",
+      "theme": "personality",
+      "headline": "STAND UP AND YOUR ENGLISH IMPROVES",
+      "accent": "Breathing does it.",
+      "caption": "Posture is not just for other people. Standing tall changes your breathing, and steadier breath is why your English comes out slower and clearer."
+    },
+    {
+      "id": "w068",
+      "theme": "leadership",
+      "headline": "LET THE SILENCE SIT",
+      "accent": "Someone will fill it.",
+      "caption": "You asked the team a question in English and got nothing. Wait five uncomfortable seconds instead of rescuing it. That is when the real answer arrives."
+    },
+    {
+      "id": "w069",
+      "theme": "mindset",
+      "headline": "NOBODY REPLAYED YOUR MISTAKE",
+      "accent": "Only you did.",
+      "caption": "That sentence you got wrong in Monday's call left everyone else's mind in nine seconds. You have been carrying it for three days. That mismatch is worth remembering."
+    },
+    {
+      "id": "w070",
+      "theme": "practice",
+      "headline": "SHOW UP ON THE BAD DAYS",
+      "accent": "That is where the English comes.",
+      "caption": "Practising when you feel sharp is easy and does little. The session you did not want to attend is the one that moves your spoken English."
+    },
+    {
+      "id": "w071",
+      "theme": "communication",
+      "headline": "GET THE NAME RIGHT",
+      "accent": "Then the rest is easier.",
+      "caption": "Saying a client's name correctly, in English, is the smallest possible effort with the largest return. Getting it wrong twice undoes a lot of good work."
+    },
+    {
+      "id": "w072",
+      "theme": "career_growth",
+      "headline": "THE OFFER GOES TO THE CLEAREST",
+      "accent": "Every round, at every level.",
+      "caption": "From the first interview to the boardroom, the pattern holds. The person who can be understood quickly, in English, under pressure, is the one who moves forward."
+    }
   ]
 }
