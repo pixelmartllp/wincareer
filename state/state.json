@@ -346,6 +346,18 @@
       "post_id": "17890687641432179",
       "permalink": "https://www.instagram.com/p/Dc70xzpIPOb/",
       "image": "01-w035.jpg"
+    },
+    {
+      "date": "2026-09-07",
+      "time": "02:16 IST",
+      "timestamp": "2026-09-06T20:46:03.516606+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w009",
+      "post_id": "122123045781314742",
+      "scheduled_for": "2026-09-07 09:00 IST",
+      "image": "01-w009.jpg"
     }
   ],
   "rotation": {
@@ -364,7 +376,8 @@
       "w052",
       "w069",
       "w057",
-      "w035"
+      "w035",
+      "w009"
     ],
     "recent_backgrounds": [
       "neutral-02.jpg",
@@ -444,6 +457,12 @@
     "2026-09-06": [
       {
         "content_id": "w035",
+        "background": "practice-05.jpg"
+      }
+    ],
+    "2026-09-07": [
+      {
+        "content_id": "w009",
         "background": "practice-05.jpg"
       }
     ]
