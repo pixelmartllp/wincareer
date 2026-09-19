@@ -741,6 +741,10 @@ def _layout_split_light(entry: dict, background: Path, out_path: Path,
             draw.text((margin, y), line, font=accent_font, fill=brand.NAVY_SOFT)
             y += accent_line_h
 
+    # Every layout carries the offer as a button - it is the one thing the
+    # creative asks anyone to do, and this one had only a line in the footer.
+    y = _offer_block(image, margin, y + int(height * 0.022))
+
     card_height = int(height * 0.0155 * 1.5) + int(height * 0.018) * 2
     card_top = min(y + int(height * 0.045),
                    footer_top - int(height * 0.045) - card_height)
@@ -1083,8 +1087,8 @@ def _layout_dark_hero(entry: dict, background: Path, out_path: Path,
     # back with a face sliced in half - which is what the general pool, shot
     # for the other layouts, mostly gives. assets/hero/ holds frames composed
     # subject-right with dark empty space on the left.
-    hero = assets.pick_hero(entry.get("theme"),
-                            seed=sum(ord(c) for c in str(entry.get("id", ""))))
+    hero = _chosen_hero(background) or assets.pick_hero(
+        entry.get("theme"), seed=sum(ord(c) for c in str(entry.get("id", ""))))
     if hero is None:
         raise RenderError(
             f"No photographs in {brand.ASSETS / assets.HERO_DIR}. This layout "
@@ -1578,6 +1582,13 @@ def _fact_strip(image: Image.Image, top: int, bottom: int) -> None:
                   fill=(196, 202, 214))
 
 
+def _chosen_hero(background) -> Path | None:
+    """The passed photograph, if it is one of the hero frames."""
+    path = Path(background)
+    hero_dir = (brand.ASSETS / assets.HERO_DIR).resolve()
+    return path if path.is_file() and path.resolve().parent == hero_dir else None
+
+
 def _layout_flyer(entry: dict, background: Path, out_path: Path,
                   canvas: str = "portrait") -> dict[str, Any]:
     size = brand.CANVAS.get(canvas)
@@ -1590,8 +1601,8 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
 
     # Same pool as dark_hero and for the same reason: the type takes the left
     # of the frame, so the photograph has to be composed subject-right.
-    hero = assets.pick_hero(entry.get("theme"),
-                            seed=sum(ord(c) for c in str(entry.get("id", ""))))
+    hero = _chosen_hero(background) or assets.pick_hero(
+        entry.get("theme"), seed=sum(ord(c) for c in str(entry.get("id", ""))))
     if hero is None:
         raise RenderError(f"No photographs in {brand.ASSETS / assets.HERO_DIR}.")
 
@@ -1720,3 +1731,266 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
 
 
 LAYOUTS["flyer"] = _layout_flyer
+
+
+# --------------------------------------------------------------------------
+# Light offer: the NS Study reference, no photograph
+# --------------------------------------------------------------------------
+#
+# Paper ground, a black-and-red stacked headline on the left, the offer as a
+# slanted red slab on the right, an audience pill, three ticked facts and the
+# contact bar. The reference fills its lower right with a styled photograph
+# of books and a plant; there is no such asset here, so the slab carries the
+# right side instead of clip art.
+#
+# The slab's *shape* is slanted, its type is not. The owner rejected a tilted
+# offer once already as looking crooked, and this keeps the energy of the
+# reference without asking anyone to read at an angle.
+
+OFFER_INK = (20, 20, 26)
+OFFER_AUDIENCE = "FOR WORKING PROFESSIONALS & STUDENTS"
+
+
+def _light_offer_slab(image: Image.Image, box: tuple[int, int, int, int]) -> int:
+    """The red slab: LIMITED SEATS / FREE / DEMO CLASS, then BOOK NOW."""
+    left, top, right, bottom = box
+    width, height = image.size
+    skew = int(width * 0.022)
+
+    shadow = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).polygon(
+        [(left + skew, top + 14), (right + skew, top + 14),
+         (right - skew, bottom + 14), (left - skew, bottom + 14)],
+        fill=(0, 0, 0, 90))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(18))
+    image.paste(shadow, (0, 0), shadow)
+
+    draw = ImageDraw.Draw(image)
+    _slant_bar(draw, (left, top, right, bottom), FLYER_RED, skew)
+
+    # Black tab across the top edge.
+    tab_font = brand.load_font("display_alt", int(height * 0.019))
+    tab = "LIMITED SEATS"
+    tracking = height * 0.0020
+    tw = tracked_width(draw, tab, tab_font, tracking)
+    tab_h = int(tab_font.size * 1.7)
+    tx0 = left + int(width * 0.02)
+    _slant_bar(draw, (tx0, top - tab_h // 2, tx0 + int(tw) + int(width * 0.05),
+                      top + tab_h // 2), OFFER_INK, 8)
+    draw_tracked(draw, (tx0 + int(width * 0.025),
+                        top - tab_font.size * 0.62), tab, tab_font,
+                 brand.WHITE, tracking)
+
+    cx = (left + right) / 2
+    inner = (right - left) - skew * 2 - int(width * 0.04)
+    for size in range(int(height * 0.150), 60, -4):
+        free_font = brand.load_font("display", size)
+        if draw.textlength("FREE", font=free_font) <= inner:
+            break
+    for size in range(int(height * 0.058), 24, -2):
+        demo_font = brand.load_font("display", size)
+        if draw.textlength("DEMO CLASS", font=demo_font) <= inner:
+            break
+
+    _, ft, _, fb = draw.textbbox((0, 0), "FREE", font=free_font)
+    _, dt, _, db = draw.textbbox((0, 0), "DEMO CLASS", font=demo_font)
+    gap = int(height * 0.010)
+    block = (fb - ft) + gap + (db - dt)
+    y = top + ((bottom - top) - block) // 2 + int(height * 0.008)
+    fw = draw.textlength("FREE", font=free_font)
+    draw.text((cx - fw / 2, y - ft), "FREE", font=free_font, fill=brand.WHITE)
+    y += (fb - ft) + gap
+    dw = draw.textlength("DEMO CLASS", font=demo_font)
+    draw.text((cx - dw / 2, y - dt), "DEMO CLASS", font=demo_font, fill=YELLOW)
+
+    # BOOK NOW pill under the slab, straight.
+    # The arrow is drawn, not typed: Oswald has no glyph for U+2192 and the
+    # first render shipped an empty box in its place.
+    pill_font = brand.load_font("display_alt", int(height * 0.020))
+    label = "BOOK NOW"
+    pw = draw.textlength(label, font=pill_font)
+    arrow_w = int(pill_font.size * 0.95)
+    gap = int(pill_font.size * 0.45)
+    ph = int(pill_font.size * 2.0)
+    inner_w = int(pw) + gap + arrow_w
+    px0 = int(cx - (inner_w + int(width * 0.06)) / 2)
+    py0 = bottom + int(height * 0.022)
+    draw.rounded_rectangle([(px0, py0), (px0 + inner_w + int(width * 0.06),
+                                         py0 + ph)],
+                           radius=ph // 2, fill=OFFER_INK)
+    tx = px0 + int(width * 0.03)
+    draw.text((tx, py0 + (ph - pill_font.size * 1.25) / 2), label,
+              font=pill_font, fill=brand.WHITE)
+    ax, ay = tx + int(pw) + gap, py0 + ph // 2
+    head = int(arrow_w * 0.42)
+    draw.line([(ax, ay), (ax + arrow_w - head // 2, ay)], fill=YELLOW,
+              width=max(3, pill_font.size // 7))
+    draw.polygon([(ax + arrow_w, ay), (ax + arrow_w - head, ay - head),
+                  (ax + arrow_w - head, ay + head)], fill=YELLOW)
+    return py0 + ph
+
+
+def _layout_light_offer(entry: dict, background: Path, out_path: Path,
+                        canvas: str = "portrait") -> dict[str, Any]:
+    size = brand.CANVAS.get(canvas)
+    if not size:
+        raise RenderError(f"Unknown canvas {canvas!r}")
+    headline = (entry.get("headline") or "").strip()
+    if not headline:
+        raise RenderError(f"Entry {entry.get('id')} has no headline")
+    accent = (entry.get("accent") or "").strip()
+
+    width, height = size
+    margin = int(width * MARGIN_X)
+    footer_top = height - int(height * FOOTER_HEIGHT)
+
+    image = _paper_ground(size)
+    draw = ImageDraw.Draw(image)
+
+    logo = assets.fit_logo(int(width * 0.28), int(height * 0.098), on_plate=False)
+    image.paste(logo, (margin, int(height * 0.045)), logo)
+
+    # Strapline, corner tag, black and red like the reference.
+    head_s, tail_s = brand.STRAPLINE.split(",", 1)
+    tag_font = brand.load_font("body_medium", int(height * 0.0150))
+    right = width - margin
+    ty = int(height * 0.055)
+    lh = int(height * 0.0150 * 1.55)
+    widest = 0
+    for i, (text, fill) in enumerate(((head_s.strip() + ",", OFFER_INK),
+                                      (tail_s.strip(), FLYER_RED))):
+        w = draw.textlength(text, font=tag_font)
+        widest = max(widest, w)
+        draw.text((right - w, ty + i * lh), text, font=tag_font, fill=fill)
+    rx = right - widest - int(width * 0.022)
+    draw.rectangle([(rx, ty), (rx + 4, ty + lh * 2 - 6)], fill=FLYER_RED)
+
+    # Kicker.
+    y = int(height * 0.205)
+    kick_font = brand.load_font("body_medium", int(height * 0.0165))
+    tracking = height * 0.0030
+    kw = tracked_width(draw, brand.CATEGORY, kick_font, tracking)
+    draw_tracked(draw, (margin, y), brand.CATEGORY, kick_font, OFFER_INK,
+                 tracking)
+    ry = y + int(kick_font.size * 0.62)
+    draw.line([(margin + kw + int(width * 0.02), ry),
+               (int(width * 0.56), ry)], fill=OFFER_INK, width=2)
+    y += int(height * 0.040)
+
+    # Headline: black, last line red.
+    column = int(width * 0.57) - margin
+    words = headline.split()
+    head_font, head_lines, line_h = None, [], 0
+    for cand in range(128, 60, -3):
+        f = brand.load_font("display", cand)
+        if any(draw.textlength(w, font=f) > column for w in words):
+            continue
+        lines = _wrap(draw, headline, f, column)
+        lh2 = int(cand * LINE_SPACING)
+        if len(lines) <= 3 and lh2 * len(lines) <= int(height * 0.30):
+            head_font, head_lines, line_h = f, lines, lh2
+            break
+    if head_font is None:
+        head_font = brand.load_font("display", 61)
+        head_lines = _wrap(draw, headline, head_font, column)[:3]
+        line_h = int(61 * LINE_SPACING)
+    ink_bottom = y
+    for i, line in enumerate(head_lines):
+        last = i == len(head_lines) - 1 and len(head_lines) > 1
+        draw.text((margin, y), line, font=head_font,
+                  fill=FLYER_RED if last else OFFER_INK)
+        ink_bottom = draw.textbbox((margin, y), line, font=head_font)[3]
+        y += line_h
+
+    # Audience pill.
+    y = ink_bottom + int(height * 0.026)
+    aud_font = None
+    for sz in range(int(height * 0.0165), 12, -1):
+        aud_font = brand.load_font("display_alt", sz)
+        if tracked_width(draw, OFFER_AUDIENCE, aud_font, height * 0.0016) \
+                <= column - int(width * 0.04):
+            break
+    aw = tracked_width(draw, OFFER_AUDIENCE, aud_font, height * 0.0016)
+    ah = int(aud_font.size * 2.0)
+    draw.rectangle([(margin, y), (margin + int(aw) + int(width * 0.04), y + ah)],
+                   fill=OFFER_INK)
+    draw_tracked(draw, (margin + int(width * 0.02),
+                        y + (ah - aud_font.size * 1.2) / 2),
+                 OFFER_AUDIENCE, aud_font, brand.WHITE, height * 0.0016)
+    y += ah + int(height * 0.024)
+
+    accent_font, accent_lines = None, []
+    if accent:
+        accent_font, accent_lines, acc_h = fit_accent(draw, accent, column)
+        for line in accent_lines:
+            draw.text((margin, y), line, font=accent_font, fill=(60, 64, 76))
+            y += acc_h
+    text_bottom = y
+
+    slab_bottom = _light_offer_slab(
+        image, (int(width * 0.615), int(height * 0.225),
+                width - margin - int(width * 0.012), int(height * 0.475)))
+
+    facts_top = footer_top - int(height * 0.125)
+    draw = ImageDraw.Draw(image)
+    draw.rounded_rectangle([(margin, facts_top), (width - margin,
+                                                  footer_top - int(height * 0.022))],
+                           radius=int(height * 0.016), fill=brand.WHITE)
+    _fact_strip_light(image, facts_top, footer_top - int(height * 0.022))
+
+    image = draw_footer(image, subline=f"Classes by {brand.MENTOR}")
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(out_path, "JPEG", quality=92, optimize=True)
+    return {
+        "image_path": str(out_path),
+        "background": Path(background).name,
+        "canvas": canvas,
+        "layout": "light_offer",
+        "strapline": brand.STRAPLINE,
+        "headline_lines": head_lines,
+        "headline_size": head_font.size,
+        "accent_lines": accent_lines,
+        "accent_size": accent_font.size if accent_font else None,
+        "scrim": None,
+        "text_bottom": text_bottom,
+        "text_seated": text_bottom <= facts_top - int(height * 0.02)
+                       and slab_bottom <= facts_top - int(height * 0.02),
+    }
+
+
+def _fact_strip_light(image: Image.Image, top: int, bottom: int) -> None:
+    """The three facts, on white, red ticks and dark type."""
+    width, height = image.size
+    margin = int(width * MARGIN_X)
+    draw = ImageDraw.Draw(image)
+    col = (width - margin * 2) / len(FLYER_FACTS)
+    big = brand.load_font("display_alt", int(height * 0.0165))
+    small = brand.load_font("body_medium", int(height * 0.0130))
+    tick_r = int(height * 0.0150)
+    mid = (top + bottom) // 2
+    for i, (line1, line2) in enumerate(FLYER_FACTS):
+        x0 = margin + col * i
+        if i:
+            draw.line([(x0, top + 18), (x0, bottom - 18)], fill=(222, 224, 230),
+                      width=2)
+        cx = int(x0 + int(width * 0.028) + tick_r)
+        draw.ellipse([(cx - tick_r, mid - tick_r), (cx + tick_r, mid + tick_r)],
+                     outline=FLYER_RED, width=3)
+        draw.line([(cx - tick_r * 0.45, mid + tick_r * 0.02),
+                   (cx - tick_r * 0.10, mid + tick_r * 0.38),
+                   (cx + tick_r * 0.50, mid - tick_r * 0.35)],
+                  fill=FLYER_RED, width=max(3, tick_r // 4), joint="curve")
+        tx = cx + tick_r + int(width * 0.014)
+        _, t1, _, b1 = draw.textbbox((0, 0), line1, font=big)
+        _, t2, _, b2 = draw.textbbox((0, 0), line2, font=small)
+        gap = int(height * 0.006)
+        block = (b1 - t1) + gap + (b2 - t2)
+        y1 = mid - block // 2 - t1
+        draw.text((tx, y1), line1, font=big, fill=OFFER_INK)
+        draw.text((tx, y1 + t1 + (b1 - t1) + gap - t2), line2, font=small,
+                  fill=(96, 100, 112))
+
+
+LAYOUTS["light_offer"] = _layout_light_offer
