@@ -200,6 +200,11 @@ CATEGORY = "LEARN ENGLISH SPEAKING"
 # than a line of small print.
 OFFER = "FREE DEMO CLASSES"
 
+# What the course is, as the biggest words on the creative in the lead-with-
+# the-product layouts. The day's insight line drops to a sub-headline under it.
+HERO_LINE = "LEARN SPOKEN ENGLISH"
+AUDIENCE = "FOR PROFESSIONALS & STUDENTS"
+
 # The three things the Academy actually teaches, for the feature card. Kept
 # to three: the Page's own flyers run five and the row turns into a list
 # nobody reads.

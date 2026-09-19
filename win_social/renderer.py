@@ -1589,8 +1589,29 @@ def _chosen_hero(background) -> Path | None:
     return path if path.is_file() and path.resolve().parent == hero_dir else None
 
 
+def _fit_subhead(draw: ImageDraw.ImageDraw, text: str, column: int,
+                 height: int) -> tuple[Any, list[str], int]:
+    """The day's line, demoted: condensed bold, at most two lines."""
+    words = text.split()
+    # Capped well below the hero. At 0.044 of the canvas the day's line came
+    # out nearly as loud as LEARN SPOKEN ENGLISH and the hierarchy the
+    # owner asked for disappeared.
+    for size in range(int(height * 0.033), int(height * 0.022), -1):
+        f = brand.load_font("display_alt", size)
+        if any(draw.textlength(w, font=f) > column for w in words):
+            continue
+        lines = _wrap(draw, text, f, column)
+        if len(lines) <= 2:
+            return f, lines, int(size * 1.20)
+    f = brand.load_font("display_alt", int(height * 0.022))
+    return f, _wrap(draw, text, f, column)[:2], int(height * 0.022 * 1.20)
+
+
 def _layout_flyer(entry: dict, background: Path, out_path: Path,
-                  canvas: str = "portrait") -> dict[str, Any]:
+                  canvas: str = "portrait", lead: bool = False) -> dict[str, Any]:
+    """lead=True puts the course itself - LEARN SPOKEN ENGLISH - in the big
+    type and demotes the day's line to a sub-headline. The owner asked for the
+    product to be the hero; the insight line is still there, just quieter."""
     size = brand.CANVAS.get(canvas)
     if not size:
         raise RenderError(f"Unknown canvas {canvas!r}")
@@ -1622,13 +1643,14 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
     y = int(height * 0.215)
     kick_font = brand.load_font("display_alt", int(height * 0.024))
     tracking = height * 0.0018
-    kw = tracked_width(draw, brand.CATEGORY, kick_font, tracking)
+    kicker = brand.AUDIENCE if lead else brand.CATEGORY
+    kw = tracked_width(draw, kicker, kick_font, tracking)
     pad = int(width * 0.018)
     kh = int(kick_font.size * 1.55)
     _slant_bar(draw, (margin - 4, y, margin + int(kw) + pad * 2, y + kh),
                FLYER_RED, 10)
     draw_tracked(draw, (margin + pad, y + (kh - kick_font.size * 1.2) / 2),
-                 brand.CATEGORY, kick_font, brand.WHITE, tracking)
+                 kicker, kick_font, brand.WHITE, tracking)
     head_top = y + kh + int(height * 0.022)
 
     # Accent is fitted first so the headline knows how much room is left
@@ -1636,7 +1658,14 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
     column = int(width * FLYER_COLUMN) - margin
     button_top = int(height * FLYER_BUTTON_TOP)
     accent_font, accent_lines, accent_h = (None, [], 0)
-    if accent:
+    accent_fill = (226, 228, 234)
+    big_text = headline
+    if lead:
+        big_text = brand.HERO_LINE
+        accent_font, accent_lines, accent_h = _fit_subhead(
+            draw, headline, column, height)
+        accent_fill = (214, 218, 228)
+    elif accent:
         accent_font, accent_lines, accent_h = fit_accent(draw, accent, column)
     accent_block = accent_h * len(accent_lines)
     # Budget includes what the highlight hangs below its line and the gap
@@ -1644,20 +1673,20 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
     # 14px above the button.
     room = button_top - int(height * 0.075) - accent_block - head_top
 
-    words = headline.split()
+    words = big_text.split()
     head_font, head_lines, line_h = None, [], 0
     for cand in FLYER_HEAD_SIZES:
         f = brand.load_font("display", cand)
         if any(draw.textlength(w, font=f) > column for w in words):
             continue
-        lines = _wrap(draw, headline, f, column)
+        lines = _wrap(draw, big_text, f, column)
         lh = int(cand * LINE_SPACING)
         if len(lines) <= 3 and lh * len(lines) <= room:
             head_font, head_lines, line_h = f, lines, lh
             break
     if head_font is None:
         head_font = brand.load_font("display", FLYER_HEAD_SIZES[-1])
-        head_lines = _wrap(draw, headline, head_font, column)[:3]
+        head_lines = _wrap(draw, big_text, head_font, column)[:3]
         line_h = int(FLYER_HEAD_SIZES[-1] * LINE_SPACING)
 
     yy = head_top
@@ -1685,8 +1714,15 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
     # highlight's padding hangs past the line box, and measuring from the line
     # box put the accent on top of it.
     yy = max(yy, ink_bottom) + int(height * 0.018)
+    if lead and accent_lines:
+        # A short yellow rule marks where the product ends and the day's
+        # line begins.
+        yy += int(height * 0.006)
+        draw.rectangle([(margin, yy), (margin + int(width * 0.07), yy + 5)],
+                       fill=YELLOW)
+        yy += int(height * 0.016)
     for line in accent_lines:
-        draw.text((margin, yy), line, font=accent_font, fill=(226, 228, 234))
+        draw.text((margin, yy), line, font=accent_font, fill=accent_fill)
         yy += accent_h
 
     text_bottom = yy
@@ -1716,7 +1752,7 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
         "offered_background": Path(background).name,
         "mentor_badge": _badge_photo_name(),
         "canvas": canvas,
-        "layout": "flyer",
+        "layout": "flyer_learn" if lead else "flyer",
         "strapline": brand.STRAPLINE,
         "headline_lines": head_lines,
         "headline_size": head_font.size,
@@ -1731,6 +1767,8 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
 
 
 LAYOUTS["flyer"] = _layout_flyer
+LAYOUTS["flyer_learn"] = lambda e, b, o, c="portrait": _layout_flyer(
+    e, b, o, c, lead=True)
 
 
 # --------------------------------------------------------------------------
