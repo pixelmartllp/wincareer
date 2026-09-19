@@ -684,6 +684,18 @@
       "permalink": "https://www.instagram.com/p/DddVUi1mu2p/",
       "image": "02-w012.jpg",
       "note": "second post of the day in the new flyer_learn design, requested by the owner"
+    },
+    {
+      "date": "2026-09-20",
+      "time": "02:27 IST",
+      "timestamp": "2026-09-19T20:57:10.484796+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w061",
+      "post_id": "122125047111314742",
+      "scheduled_for": "2026-09-20 09:00 IST",
+      "image": "01-w061.jpg"
     }
   ],
   "rotation": {
@@ -716,7 +728,8 @@
       "w056",
       "w073",
       "w022",
-      "w012"
+      "w012",
+      "w061"
     ],
     "recent_backgrounds": [
       "neutral-08.jpg",
@@ -733,12 +746,6 @@
     "cycles": 0
   },
   "plans": {
-    "2026-09-06": [
-      {
-        "content_id": "w035",
-        "background": "practice-05.jpg"
-      }
-    ],
     "2026-09-07": [
       {
         "content_id": "w009",
@@ -815,6 +822,12 @@
       {
         "content_id": "w022",
         "background": "interview-01.jpg"
+      }
+    ],
+    "2026-09-20": [
+      {
+        "content_id": "w061",
+        "background": "spoken_english-01.jpg"
       }
     ]
   }
