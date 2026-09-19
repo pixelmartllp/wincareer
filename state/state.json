@@ -658,6 +658,32 @@
       "post_id": "18111818579134129",
       "permalink": "https://www.instagram.com/p/DddSj2Pk3th/",
       "image": "01-w022.jpg"
+    },
+    {
+      "date": "2026-09-19",
+      "time": "11:39 IST",
+      "timestamp": "2026-09-19T06:09:17.163479+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w012",
+      "post_id": "1091123227419567_122124973131314742",
+      "permalink": "https://www.facebook.com/1091123227419567_122124973131314742",
+      "image": "02-w012.jpg",
+      "note": "second post of the day in the new flyer_learn design, requested by the owner"
+    },
+    {
+      "date": "2026-09-19",
+      "time": "11:39 IST",
+      "timestamp": "2026-09-19T06:09:35.363184+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w012",
+      "post_id": "18416489863157324",
+      "permalink": "https://www.instagram.com/p/DddVUi1mu2p/",
+      "image": "02-w012.jpg",
+      "note": "second post of the day in the new flyer_learn design, requested by the owner"
     }
   ],
   "rotation": {
@@ -689,10 +715,10 @@
       "w083",
       "w056",
       "w073",
-      "w022"
+      "w022",
+      "w012"
     ],
     "recent_backgrounds": [
-      "neutral-02.jpg",
       "neutral-08.jpg",
       "neutral-19.jpg",
       "neutral-18.jpg",
@@ -701,7 +727,8 @@
       "neutral-14.jpg",
       "public_speaking-04.jpg",
       "practice-05.jpg",
-      "interview-01.jpg"
+      "interview-01.jpg",
+      "spoken_english-01.jpg"
     ],
     "cycles": 0
   },
