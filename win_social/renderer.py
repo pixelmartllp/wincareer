@@ -1418,6 +1418,7 @@ LAYOUTS["dark_card"] = lambda e, b, o, c="portrait": _layout_card(e, b, o, c,
 # facts. Everything left is either the hook, the offer, or how to act on it.
 
 FLYER_COLUMN = 0.60              # right edge of the type column
+FLYER_SUB_COLUMN = 0.50          # right edge of the demoted day's line
 FLYER_BUTTON_TOP = 0.645         # the button sits here whatever the headline does
 FLYER_HEAD_SIZES = tuple(range(118, 63, -3))
 YELLOW = (255, 210, 31)
@@ -1662,8 +1663,12 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
     big_text = headline
     if lead:
         big_text = brand.HERO_LINE
+        # Narrower than the hero's column: the sub-line is small and pale, so
+        # it has to stay in the dark part of the frame. At the hero's width it
+        # ran into whatever the subject was holding - a student's open book
+        # sat right under "NOT".
         accent_font, accent_lines, accent_h = _fit_subhead(
-            draw, headline, column, height)
+            draw, headline, int(width * FLYER_SUB_COLUMN) - margin, height)
         accent_fill = (214, 218, 228)
     elif accent:
         accent_font, accent_lines, accent_h = fit_accent(draw, accent, column)
@@ -1715,6 +1720,22 @@ def _layout_flyer(entry: dict, background: Path, out_path: Path,
     # box put the accent on top of it.
     yy = max(yy, ink_bottom) + int(height * 0.018)
     if lead and accent_lines:
+        # A soft dark pool behind the sub-line. Narrowing its column was tried
+        # first and was not enough: in the student photograph the open book
+        # reaches a third of the way into the frame, so the line sat on white
+        # paper however narrow it was. The pool follows the text's own extent
+        # and is blurred so it reads as shadow, not as a box.
+        sub_w = max(draw.textlength(l, font=accent_font) for l in accent_lines)
+        top_ = yy - int(height * 0.01)
+        bot_ = yy + int(height * 0.028) + accent_h * len(accent_lines) + int(height * 0.01)
+        pool = Image.new("L", image.size, 0)
+        ImageDraw.Draw(pool).rounded_rectangle(
+            [(0, top_), (margin + int(sub_w) + int(width * 0.05), bot_)],
+            radius=int(height * 0.03), fill=205)
+        pool = pool.filter(ImageFilter.GaussianBlur(int(height * 0.022)))
+        image = Image.composite(Image.new("RGB", image.size, (8, 14, 30)),
+                                image, pool)
+        draw = ImageDraw.Draw(image)
         # A short yellow rule marks where the product ends and the day's
         # line begins.
         yy += int(height * 0.006)
