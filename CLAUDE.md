@@ -19,7 +19,19 @@ Neither brand can publish to the other's Page.
 
 ## 1. Standing decisions (do not re-litigate)
 
-### 1.1 The creative is `flyer` (since 19 Sep 2026)
+### 1.1 The creative is `flyer_learn` (since 19 Sep 2026)
+
+`flyer` in lead mode: **LEARN SPOKEN ENGLISH** is the hero (ENGLISH on the
+yellow slash), the kicker reads FOR PROFESSIONALS & STUDENTS, and the day's
+content-bank headline drops to a sub-headline capped at 0.033 of the canvas -
+at 0.044 it was nearly as loud as the hero and the hierarchy disappeared. The
+owner asked for the product, not the daily insight, to be the biggest words.
+
+The mentor chip's face crop is `MENTOR_FACE = (0.575, 0.245)`, read off a grid
+laid over the photograph; the earlier (0.64, 0.23) put her face at the edge of
+the circle. A replacement photograph needs these re-measured.
+
+### 1.1b `flyer` - the same layout without lead mode
 
 Built from the Academy's own "Do you have that English speaking confident?"
 flyer, which the owner sent asking for the same thing with less text: the

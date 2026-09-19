@@ -778,7 +778,7 @@ LAYOUTS = {
     "photo_dark": _layout_photo_dark,
 }
 
-DEFAULT_LAYOUT = "flyer"
+DEFAULT_LAYOUT = "flyer_learn"
 
 
 def render(entry: dict, background: Path, out_path: Path,
@@ -843,8 +843,8 @@ def _warm_ground(canvas: tuple[int, int]) -> Image.Image:
 
 
 MENTOR_BADGE = 0.105             # badge diameter as a fraction of the canvas
-MENTOR_FACE = (0.64, 0.23)       # where her face sits in the mentor photo
-MENTOR_FACE_BOX = 0.30           # crop size, as a fraction of its height
+MENTOR_FACE = (0.575, 0.245)     # face centre, read off a grid laid over the photo
+MENTOR_FACE_BOX = 0.28           # head and hair, no wall logo
 
 
 def _badge_photo_name() -> str | None:
