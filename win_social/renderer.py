@@ -774,7 +774,7 @@ LAYOUTS = {
     "photo_dark": _layout_photo_dark,
 }
 
-DEFAULT_LAYOUT = "dark_hero"
+DEFAULT_LAYOUT = "flyer"
 
 
 def render(entry: dict, background: Path, out_path: Path,
@@ -848,6 +848,30 @@ def _badge_photo_name() -> str | None:
     return photos[0].name if photos else None
 
 
+def _mentor_circle(photo: Path, side: int) -> tuple[Image.Image, Image.Image]:
+    """The mentor's face, cropped tight and masked to a circle.
+
+    Crop tight on the face. The first version took the largest square from
+    the top of the frame, which on this photograph is mostly the logo on the
+    wall behind her - a badge of the wall, not of the mentor. MENTOR_FACE
+    describes where she is in *this* photograph; a replacement shot may need
+    it moved.
+    """
+    portrait = Image.open(photo).convert("RGB")
+    w, h = portrait.size
+    box = int(h * MENTOR_FACE_BOX)
+    cx, cy = int(w * MENTOR_FACE[0]), int(h * MENTOR_FACE[1])
+    left = max(0, min(w - box, cx - box // 2))
+    top = max(0, min(h - box, cy - box // 2))
+    portrait = portrait.crop((left, top, left + box, top + box))
+    portrait = portrait.resize((side, side), Image.LANCZOS)
+
+    mask = Image.new("L", (side * 4, side * 4), 0)
+    ImageDraw.Draw(mask).ellipse([(0, 0), (side * 4 - 1, side * 4 - 1)],
+                                 fill=255)
+    return portrait, mask.resize((side, side), Image.LANCZOS)
+
+
 def _mentor_badge(image: Image.Image, footer_top: int) -> None:
     """A small circular portrait of the mentor, with her name beside it.
 
@@ -867,25 +891,7 @@ def _mentor_badge(image: Image.Image, footer_top: int) -> None:
     width, height = image.size
     side = int(height * MENTOR_BADGE)
     margin = int(width * MARGIN_X)
-
-    portrait = Image.open(photos[0]).convert("RGB")
-    w, h = portrait.size
-    # Crop tight on the face. The first version took the largest square from
-    # the top of the frame, which on this photograph is mostly the logo on
-    # the wall behind her - a badge of the wall, not of the mentor. These
-    # fractions describe where she is in *this* photograph; a replacement
-    # shot may need them moved.
-    box = int(h * MENTOR_FACE_BOX)
-    cx, cy = int(w * MENTOR_FACE[0]), int(h * MENTOR_FACE[1])
-    left = max(0, min(w - box, cx - box // 2))
-    top = max(0, min(h - box, cy - box // 2))
-    portrait = portrait.crop((left, top, left + box, top + box))
-    portrait = portrait.resize((side, side), Image.LANCZOS)
-
-    mask = Image.new("L", (side * 4, side * 4), 0)
-    ImageDraw.Draw(mask).ellipse([(0, 0), (side * 4 - 1, side * 4 - 1)],
-                                 fill=255)
-    mask = mask.resize((side, side), Image.LANCZOS)   # cheap antialiasing
+    portrait, mask = _mentor_circle(photos[0], side)
 
     ring = Image.new("RGBA", (side + 8, side + 8), (0, 0, 0, 0))
     ImageDraw.Draw(ring).ellipse([(0, 0), (side + 7, side + 7)],
@@ -1391,3 +1397,326 @@ def _layout_card(entry: dict, background: Path, out_path: Path,
 LAYOUTS["light_card"] = _layout_card
 LAYOUTS["dark_card"] = lambda e, b, o, c="portrait": _layout_card(e, b, o, c,
                                                                  dark=True)
+
+
+# --------------------------------------------------------------------------
+# Flyer: the Academy's own campaign look, with the words cut back
+# --------------------------------------------------------------------------
+#
+# Modelled on the Academy's own "Do you have that English speaking confident?"
+# flyer: photograph on the right, the headline hit with brush-stroke
+# highlights, a big red Free Demo Class button with LIMITED SEATS under it, a
+# strip of what the class actually offers, and the contact bar.
+#
+# The owner asked for it with less text, so what the original carries and this
+# does not: the four icon features (drawn icons at this size look home-made),
+# the script taglines, the social handles, the website, and one of the four
+# facts. Everything left is either the hook, the offer, or how to act on it.
+
+FLYER_COLUMN = 0.60              # right edge of the type column
+FLYER_BUTTON_TOP = 0.645         # the button sits here whatever the headline does
+FLYER_HEAD_SIZES = tuple(range(118, 63, -3))
+YELLOW = (255, 210, 31)
+FLYER_RED = (214, 24, 34)
+FLYER_FACTS = (("ONLY 2 STUDENTS", "per batch"),
+               ("PRACTICE MATERIAL", "included"),
+               ("ONE-TO-ONE", "coaching"))
+
+
+def _slant_bar(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int],
+               fill: tuple[int, int, int], skew: int) -> None:
+    """A parallelogram behind a line of type - the brush-stroke highlight.
+
+    A real brush texture would need artwork; the slant alone carries most of
+    the energy of the original, and it stays crisp at any size.
+    """
+    left, top, right, bottom = box
+    draw.polygon([(left + skew, top), (right + skew, top),
+                  (right - skew, bottom), (left - skew, bottom)], fill=fill)
+
+
+def _flyer_shade(image: Image.Image, footer_top: int) -> Image.Image:
+    """Darken the left for the type and the bottom for the offer strip."""
+    width, height = image.size
+    layer = Image.new("L", (width, 1), 0)
+    px = layer.load()
+    for x in range(width):
+        f = x / width
+        if f < 0.30:
+            a = 238
+        elif f < 0.72:
+            a = int(238 * (1 - (f - 0.30) / 0.42) ** 1.3)
+        else:
+            a = 0
+        px[x, 0] = a
+    horizontal = layer.resize((width, height))
+
+    vertical = Image.new("L", (1, height), 0)
+    pv = vertical.load()
+    start = int(height * 0.60)
+    for y in range(height):
+        if y > start:
+            pv[0, y] = int(min(1.0, (y - start) / max(1, footer_top - start)) * 225)
+    vertical = vertical.resize((width, height))
+
+    from PIL import ImageChops
+    mask = ImageChops.lighter(horizontal, vertical)
+    navy = Image.new("RGB", image.size, (8, 14, 30))
+    return Image.composite(navy, image, mask)
+
+
+def _mentor_chip(image: Image.Image, right: int, top: int) -> None:
+    """Small portrait top right: who teaches this."""
+    photos = list_mentor_photos()
+    if not photos:
+        return
+    width, height = image.size
+    side = int(height * 0.072)
+    portrait, mask = _mentor_circle(photos[0], side)
+
+    x = right - side
+    ring = Image.new("RGBA", (side + 8, side + 8), (0, 0, 0, 0))
+    ImageDraw.Draw(ring).ellipse([(0, 0), (side + 7, side + 7)],
+                                 fill=(*YELLOW, 255))
+    image.paste(ring, (x - 4, top - 4), ring)
+    image.paste(portrait, (x, top), mask)
+
+    draw = ImageDraw.Draw(image)
+    small = brand.load_font("body_medium", int(height * 0.0135))
+    name = brand.load_font("body_medium", int(height * 0.0170))
+    gap = int(width * 0.018)
+    for text, font, fill, dy in (("Classes by", small, YELLOW, 0.20),
+                                 (brand.MENTOR, name, brand.WHITE, 0.48)):
+        w = draw.textlength(text, font=font)
+        draw.text((x - gap - w, top + side * dy), text, font=font, fill=fill)
+
+
+def _flyer_button(image: Image.Image, top: int) -> int:
+    """The Free Demo Class button, full measure. Returns its bottom edge."""
+    width, height = image.size
+    margin = int(width * MARGIN_X)
+    btn_h = int(height * 0.084)
+    left, right = margin, width - margin
+    radius = btn_h // 2
+
+    shadow = Image.new("RGBA", (right - left + 80, btn_h + 80), (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).rounded_rectangle(
+        [(40, 40), (right - left + 39, btn_h + 39)], radius=radius,
+        fill=(0, 0, 0, 170))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(16))
+    image.paste(shadow, (left - 40, top - 40 + int(height * 0.008)), shadow)
+
+    draw = ImageDraw.Draw(image)
+    draw.rounded_rectangle([(left, top), (right, top + btn_h)], radius=radius,
+                           fill=FLYER_RED, outline=(255, 255, 255), width=3)
+
+    font = brand.load_font("display", int(height * 0.052))
+    first, rest = "FREE ", "DEMO CLASS"
+    w1 = draw.textlength(first, font=font)
+    w2 = draw.textlength(rest, font=font)
+    disc = int(btn_h * 0.62)
+    total = w1 + w2 + int(width * 0.03) + disc
+    x = left + ((right - left) - total) / 2
+    ty = top + (btn_h - font.size * 1.18) / 2
+    draw.text((x, ty), first, font=font, fill=YELLOW)
+    draw.text((x + w1, ty), rest, font=font, fill=brand.WHITE)
+
+    cx = int(x + w1 + w2 + int(width * 0.03) + disc / 2)
+    cy = top + btn_h // 2
+    r = disc // 2
+    draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], fill=brand.WHITE)
+    shaft, head = int(r * 0.52), int(r * 0.34)
+    draw.line([(cx - shaft, cy), (cx + shaft * 0.35, cy)], fill=FLYER_RED,
+              width=max(3, r // 6))
+    draw.polygon([(cx + shaft, cy), (cx + shaft - head, cy - head),
+                  (cx + shaft - head, cy + head)], fill=FLYER_RED)
+
+    bottom = top + btn_h
+    tag_font = brand.load_font("body_medium", int(height * 0.0165))
+    tag = "LIMITED SEATS   |   BOOK NOW"
+    tracking = height * 0.0028
+    tw = tracked_width(draw, tag, tag_font, tracking)
+    draw_tracked(draw, ((width - tw) / 2, bottom + int(height * 0.016)), tag,
+                 tag_font, brand.WHITE, tracking)
+    return bottom
+
+
+def _fact_strip(image: Image.Image, top: int, bottom: int) -> None:
+    """Three facts about the class, ticked, across the full width."""
+    width, height = image.size
+    margin = int(width * MARGIN_X)
+    draw = ImageDraw.Draw(image)
+
+    col = (width - margin * 2) / len(FLYER_FACTS)
+    big = brand.load_font("display_alt", int(height * 0.0172))
+    small = brand.load_font("body_medium", int(height * 0.0135))
+    tick_r = int(height * 0.0155)
+    mid = (top + bottom) // 2
+
+    for i, (line1, line2) in enumerate(FLYER_FACTS):
+        x0 = margin + col * i
+        if i:
+            draw.line([(x0, top + 14), (x0, bottom - 14)],
+                      fill=(70, 78, 98), width=2)
+        cx = int(x0 + (col * 0.06 if i else 0) + tick_r)
+        draw.ellipse([(cx - tick_r, mid - tick_r), (cx + tick_r, mid + tick_r)],
+                     fill=YELLOW)
+        draw.line([(cx - tick_r * 0.45, mid + tick_r * 0.02),
+                   (cx - tick_r * 0.10, mid + tick_r * 0.38),
+                   (cx + tick_r * 0.50, mid - tick_r * 0.35)],
+                  fill=(8, 14, 30), width=max(3, tick_r // 4), joint="curve")
+        tx = cx + tick_r + int(width * 0.014)
+        # Stacked from measured boxes, centred on the tick as a pair. Placing
+        # them by font size put the second line on top of the first.
+        _, t1, _, b1 = draw.textbbox((0, 0), line1, font=big)
+        _, t2, _, b2 = draw.textbbox((0, 0), line2, font=small)
+        gap = int(height * 0.006)
+        block = (b1 - t1) + gap + (b2 - t2)
+        y1 = mid - block // 2 - t1
+        draw.text((tx, y1), line1, font=big, fill=brand.WHITE)
+        draw.text((tx, y1 + t1 + (b1 - t1) + gap - t2), line2, font=small,
+                  fill=(196, 202, 214))
+
+
+def _layout_flyer(entry: dict, background: Path, out_path: Path,
+                  canvas: str = "portrait") -> dict[str, Any]:
+    size = brand.CANVAS.get(canvas)
+    if not size:
+        raise RenderError(f"Unknown canvas {canvas!r}")
+    headline = (entry.get("headline") or "").strip()
+    if not headline:
+        raise RenderError(f"Entry {entry.get('id')} has no headline")
+    accent = (entry.get("accent") or "").strip()
+
+    # Same pool as dark_hero and for the same reason: the type takes the left
+    # of the frame, so the photograph has to be composed subject-right.
+    hero = assets.pick_hero(entry.get("theme"),
+                            seed=sum(ord(c) for c in str(entry.get("id", ""))))
+    if hero is None:
+        raise RenderError(f"No photographs in {brand.ASSETS / assets.HERO_DIR}.")
+
+    width, height = size
+    margin = int(width * MARGIN_X)
+    footer_top = height - int(height * FOOTER_HEIGHT)
+
+    image = vignette(grade(crop_to_canvas(Image.open(hero).convert("RGB"), size)))
+    image = _flyer_shade(image, footer_top)
+    draw = ImageDraw.Draw(image)
+
+    logo = assets.fit_logo(int(width * 0.27), int(height * 0.095), on_plate=True)
+    image.paste(logo, (margin, int(height * 0.045)), logo)
+    _mentor_chip(image, width - margin, int(height * 0.050))
+
+    # Kicker on a red slash.
+    y = int(height * 0.215)
+    kick_font = brand.load_font("display_alt", int(height * 0.024))
+    tracking = height * 0.0018
+    kw = tracked_width(draw, brand.CATEGORY, kick_font, tracking)
+    pad = int(width * 0.018)
+    kh = int(kick_font.size * 1.55)
+    _slant_bar(draw, (margin - 4, y, margin + int(kw) + pad * 2, y + kh),
+               FLYER_RED, 10)
+    draw_tracked(draw, (margin + pad, y + (kh - kick_font.size * 1.2) / 2),
+                 brand.CATEGORY, kick_font, brand.WHITE, tracking)
+    head_top = y + kh + int(height * 0.022)
+
+    # Accent is fitted first so the headline knows how much room is left
+    # before the button, which never moves.
+    column = int(width * FLYER_COLUMN) - margin
+    button_top = int(height * FLYER_BUTTON_TOP)
+    accent_font, accent_lines, accent_h = (None, [], 0)
+    if accent:
+        accent_font, accent_lines, accent_h = fit_accent(draw, accent, column)
+    accent_block = accent_h * len(accent_lines)
+    # Budget includes what the highlight hangs below its line and the gap
+    # the accent then takes - leaving those out let thirteen entries finish
+    # 14px above the button.
+    room = button_top - int(height * 0.075) - accent_block - head_top
+
+    words = headline.split()
+    head_font, head_lines, line_h = None, [], 0
+    for cand in FLYER_HEAD_SIZES:
+        f = brand.load_font("display", cand)
+        if any(draw.textlength(w, font=f) > column for w in words):
+            continue
+        lines = _wrap(draw, headline, f, column)
+        lh = int(cand * LINE_SPACING)
+        if len(lines) <= 3 and lh * len(lines) <= room:
+            head_font, head_lines, line_h = f, lines, lh
+            break
+    if head_font is None:
+        head_font = brand.load_font("display", FLYER_HEAD_SIZES[-1])
+        head_lines = _wrap(draw, headline, head_font, column)[:3]
+        line_h = int(FLYER_HEAD_SIZES[-1] * LINE_SPACING)
+
+    yy = head_top
+    ink_bottom = head_top
+    for i, line in enumerate(head_lines):
+        last = i == len(head_lines) - 1 and len(head_lines) > 1
+        ink_bottom = max(ink_bottom,
+                         draw.textbbox((margin, yy), line, font=head_font)[3])
+        if last:
+            # Placed on the glyphs' real bounding box. Anton draws well below
+            # its origin, so a bar sized from the line height sat half a line
+            # too high - it cut into the line above and the caps hung out of
+            # the bottom of it.
+            l, t, r, b = draw.textbbox((margin, yy), line, font=head_font)
+            pad = int(head_font.size * 0.10)
+            _slant_bar(draw, (l - pad, t - pad, r + pad + 6, b + pad),
+                       YELLOW, 12)
+            ink_bottom = max(ink_bottom, b + pad)
+            draw.text((margin, yy), line, font=head_font, fill=(12, 12, 18))
+        else:
+            draw.text((margin, yy), line, font=head_font, fill=brand.WHITE)
+        yy += line_h
+
+    # The accent starts below whatever the headline actually inked - the
+    # highlight's padding hangs past the line box, and measuring from the line
+    # box put the accent on top of it.
+    yy = max(yy, ink_bottom) + int(height * 0.018)
+    for line in accent_lines:
+        draw.text((margin, yy), line, font=accent_font, fill=(226, 228, 234))
+        yy += accent_h
+
+    text_bottom = yy
+    _flyer_button(image, button_top)
+    _fact_strip(image, footer_top - int(height * 0.098), footer_top - 6)
+
+    image = draw_footer(image, subline=brand.BRAND_TAGLINE)
+    # The reference ends on a blue-purple-red band. Here it is a rule across
+    # the top of the footer rather than a third strip of lettering.
+    draw = ImageDraw.Draw(image)
+    stops = [(22, 70, 200), (122, 42, 180), (214, 24, 34)]
+    for x in range(width):
+        t = x / (width - 1) * (len(stops) - 1)
+        k = min(int(t), len(stops) - 2)
+        f = t - k
+        c = tuple(int(stops[k][j] + (stops[k + 1][j] - stops[k][j]) * f)
+                  for j in range(3))
+        draw.line([(x, footer_top), (x, footer_top + 6)], fill=c)
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    image.save(out_path, "JPEG", quality=92, optimize=True)
+
+    return {
+        "image_path": str(out_path),
+        "background": hero.name,
+        "offered_background": Path(background).name,
+        "mentor_badge": _badge_photo_name(),
+        "canvas": canvas,
+        "layout": "flyer",
+        "strapline": brand.STRAPLINE,
+        "headline_lines": head_lines,
+        "headline_size": head_font.size,
+        "accent_lines": accent_lines,
+        "accent_size": accent_font.size if accent_font else None,
+        "scrim": None,
+        # Measured, not assumed: the button never moves, so a long headline
+        # plus a two-line accent is the one way this layout can collide.
+        "text_bottom": text_bottom,
+        "text_seated": text_bottom <= button_top - int(height * 0.012),
+    }
+
+
+LAYOUTS["flyer"] = _layout_flyer

@@ -19,7 +19,23 @@ Neither brand can publish to the other's Page.
 
 ## 1. Standing decisions (do not re-litigate)
 
-### 1.1 The creative is `dark_hero`
+### 1.1 The creative is `flyer` (since 19 Sep 2026)
+
+Built from the Academy's own "Do you have that English speaking confident?"
+flyer, which the owner sent asking for the same thing with less text: the
+day's headline with its last line on a yellow slash, a red `LEARN ENGLISH
+SPEAKING` kicker, a full-width red **FREE DEMO CLASS** button with LIMITED
+SEATS under it, three ticked facts (2 students per batch, practice material,
+one-to-one), Mandeepa as a small "Classes by" chip top right, and the footer.
+Left out on purpose: the four drawn icons, script taglines, handles, website.
+
+Two things measured rather than eyeballed: the yellow slash is placed on the
+glyphs' real bounding box (sized from line height it sat half a line high),
+and every render reports `text_bottom` against the fixed button - all 88
+entries clear it by at least 55px. Photographs come from `assets/hero/`, same
+as `dark_hero`.
+
+### 1.1a The previous default, `dark_hero`
 
 Near-black ground with a warm desk-light pool, kicker, stacked headline,
 free-demo block, the mentor faded in on the right, footer with the number and
