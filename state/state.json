@@ -972,6 +972,18 @@
       "post_id": "18112655339018465",
       "permalink": "https://www.instagram.com/p/Dd8VnwIFHCN/",
       "image": "01-w067.jpg"
+    },
+    {
+      "date": "2026-10-02",
+      "time": "04:22 IST",
+      "timestamp": "2026-10-01T22:52:33.474498+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w047",
+      "post_id": "122126835981314742",
+      "scheduled_for": "2026-10-02 09:00 IST",
+      "image": "01-w047.jpg"
     }
   ],
   "rotation": {
@@ -1016,7 +1028,8 @@
       "w078",
       "w076",
       "w058",
-      "w067"
+      "w067",
+      "w047"
     ],
     "recent_backgrounds": [
       "neutral-18.jpg",
@@ -1027,18 +1040,12 @@
       "spoken_english-01.jpg",
       "public_speaking-07.jpg",
       "communication-01.jpg",
-      "interview-01.jpg",
-      "practice-05.jpg"
+      "practice-05.jpg",
+      "interview-01.jpg"
     ],
     "cycles": 0
   },
   "plans": {
-    "2026-09-18": [
-      {
-        "content_id": "w073",
-        "background": "interview-01.jpg"
-      }
-    ],
     "2026-09-19": [
       {
         "content_id": "w022",
@@ -1115,6 +1122,12 @@
       {
         "content_id": "w067",
         "background": "practice-05.jpg"
+      }
+    ],
+    "2026-10-02": [
+      {
+        "content_id": "w047",
+        "background": "interview-01.jpg"
       }
     ]
   }
