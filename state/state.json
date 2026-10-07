@@ -1116,6 +1116,18 @@
       "post_id": "18115163474108861",
       "permalink": "https://www.instagram.com/p/DeLyhafmDz0/",
       "image": "01-w019.jpg"
+    },
+    {
+      "date": "2026-10-08",
+      "time": "04:47 IST",
+      "timestamp": "2026-10-07T23:17:02.817460+00:00",
+      "platform": "facebook",
+      "kind": "creative",
+      "ok": true,
+      "content_id": "w011",
+      "post_id": "122127741513314742",
+      "scheduled_for": "2026-10-08 09:00 IST",
+      "image": "01-w011.jpg"
     }
   ],
   "rotation": {
@@ -1166,29 +1178,24 @@
       "w088",
       "w043",
       "w006",
-      "w019"
+      "w019",
+      "w011"
     ],
     "recent_backgrounds": [
       "neutral-09.jpg",
       "practice-04.jpg",
       "neutral-14.jpg",
       "public_speaking-04.jpg",
-      "spoken_english-01.jpg",
       "practice-05.jpg",
       "public_speaking-07.jpg",
       "public_speaking-06.jpg",
       "communication-01.jpg",
-      "interview-01.jpg"
+      "interview-01.jpg",
+      "spoken_english-01.jpg"
     ],
     "cycles": 0
   },
   "plans": {
-    "2026-09-24": [
-      {
-        "content_id": "w024",
-        "background": "interview-01.jpg"
-      }
-    ],
     "2026-09-25": [
       {
         "content_id": "w075",
@@ -1265,6 +1272,12 @@
       {
         "content_id": "w019",
         "background": "interview-01.jpg"
+      }
+    ],
+    "2026-10-08": [
+      {
+        "content_id": "w011",
+        "background": "spoken_english-01.jpg"
       }
     ]
   }
