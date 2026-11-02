@@ -1728,6 +1728,17 @@
       "post_id": "122131777245314742",
       "scheduled_for": "2026-11-02 09:00 IST",
       "image": "01-w081.jpg"
+    },
+    {
+      "date": "2026-11-02",
+      "time": "13:06 IST",
+      "timestamp": "2026-11-02T07:36:24.099177+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": false,
+      "content_id": "w081",
+      "error": "OAuthException (code 9007): Media ID is not available",
+      "image": "01-w081.jpg"
     }
   ],
   "rotation": {
