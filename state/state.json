@@ -1990,6 +1990,17 @@
       "content_id": "w032",
       "error": "OAuthException (code 9007): Media ID is not available",
       "image": "01-w032.jpg"
+    },
+    {
+      "date": "2026-11-12",
+      "time": "13:42 IST",
+      "timestamp": "2026-11-12T08:12:45.070403+00:00",
+      "platform": "instagram",
+      "kind": "creative",
+      "ok": false,
+      "content_id": "w032",
+      "error": "OAuthException (code 9007): Media ID is not available",
+      "image": "01-w032.jpg"
     }
   ],
   "rotation": {
